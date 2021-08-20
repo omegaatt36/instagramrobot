@@ -10,10 +10,13 @@ import (
 	"github.com/gocolly/colly"
 )
 
-func GetPostWithCode(code string) (string, error) {
-	c := colly.NewCollector()
+type API struct {
+	result response.EmbedResponse
+	body   []byte
+}
 
-	res := ""
+func (a *API) GetPostWithCode(code string) (response.EmbedResponse, error) {
+	c := colly.NewCollector()
 
 	// Find and visit all links
 	c.OnHTML("script", func(e *colly.HTMLElement) {
@@ -21,8 +24,10 @@ func GetPostWithCode(code string) (string, error) {
 		if !strings.Contains(e.Text, validateText) {
 			return
 		}
-		res = strings.Replace(e.Text, validateText, "", 1)
+		res := strings.Replace(e.Text, validateText, "", 1)
 		res = strings.Replace(res, ");", "", 1)
+
+		json.Unmarshal([]byte(res), &a.result)
 	})
 
 	// c.OnRequest(func(r *colly.Request) {
@@ -30,22 +35,20 @@ func GetPostWithCode(code string) (string, error) {
 	// 	fmt.Println("Visiting", r.URL)
 	// })
 
-	// c.OnResponse(func(r *colly.Response) {
-	// 	// TODO: replace with debugger
-	// 	fmt.Println("Response", r.Headers)
-	// })
+	c.OnResponse(func(r *colly.Response) {
+		// TODO: replace with debugger
+		// fmt.Println("Response", r.Headers)
+		a.body = r.Body
+	})
 
 	c.Visit(fmt.Sprintf("https://www.instagram.com/p/%v/embed/captioned/", code))
 
-	if res == "" {
-		return "", errors.New("couldn't parse Instagram JSON")
+	if !a.result.IsEmpty() {
+		fmt.Printf("%+v\n", a.result)
+
+		return a.result, nil
 	}
 
-	var result response.EmbedResponse
-
-	json.Unmarshal([]byte(res), &result)
-
-	fmt.Printf("%+v\n", result)
-
-	return res, nil
+	// Try second method by HTML parse body
+	return a.result, errors.New("couldn't parse Instagram JSON")
 }

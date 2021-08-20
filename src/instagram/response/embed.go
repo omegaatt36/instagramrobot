@@ -41,6 +41,7 @@ type EmbedResponse struct {
 		Type             string            `json:"__typename"`
 		Id               string            `json:"id"`
 		Shortcode        string            `json:"shortcode"`
+		ProductType      string            `json:"product_type"`
 		TakenAt          types.Time        `json:"taken_at_timestamp"`
 		CommenterCount   uint64            `json:"commenter_count"`
 		Comments         WithCount         `json:"edge_media_to_comment"`
@@ -54,7 +55,6 @@ type EmbedResponse struct {
 
 		IsVideo        bool   `json:"is_video"`
 		Title          string `json:"title"`
-		ProductType    string `json:"product_type"`
 		VideoURL       string `json:"video_url"`
 		VideoViewCount uint64 `json:"video_view_count"`
 
@@ -68,4 +68,8 @@ type EmbedResponse struct {
 		// coauthor_producers
 
 	} `json:"shortcode_media"`
+}
+
+func (s EmbedResponse) IsEmpty() bool {
+	return s.ShortcodeMedia.Id == ""
 }

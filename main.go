@@ -7,7 +7,9 @@ import (
 func main() {
 	code := "CSft2G5pFgr"
 
-	response, err := instagram.GetPostWithCode(code)
+	ig := instagram.API{}
+
+	response, err := ig.GetPostWithCode(code)
 	if err != nil {
 		return
 	}
