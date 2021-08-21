@@ -47,6 +47,30 @@ type Owner struct {
 	Timeline          OwnerTimeline `json:"edge_owner_to_timeline_media"`
 }
 
+type SliderItems struct {
+	Edges []struct {
+		Node struct {
+			Type             string     `json:"__typename"`
+			Id               string     `json:"id"`
+			Shortcode        string     `json:"shortcode"`
+			ProductType      string     `json:"product_type"`
+			CommenterCount   uint64     `json:"commenter_count"`
+			Dimensions       Dimensions `json:"dimensions"`
+			DisplayURL       string     `json:"display_url"`
+			DisplayResources []Resource `json:"display_resources"`
+
+			IsVideo        bool   `json:"is_video"`
+			Title          string `json:"title"`
+			VideoURL       string `json:"video_url"`
+			VideoViewCount uint64 `json:"video_view_count"`
+
+			// clips_music_attribution_info
+			// media_overlay_info
+			// sharing_friction_info
+		} `json:"node"`
+	} `json:"edges"`
+}
+
 type ShortcodeMedia struct {
 	Type             string     `json:"__typename"`
 	Id               string     `json:"id"`
@@ -68,9 +92,12 @@ type ShortcodeMedia struct {
 	VideoURL       string `json:"video_url"`
 	VideoViewCount uint64 `json:"video_view_count"`
 
+	SliderItems SliderItems `json:"edge_sidecar_to_children"`
+
 	// clips_music_attribution_info
 	// media_overlay_info
 	// sharing_friction_info
+
 	// edge_media_to_sponsor_user
 	// is_affiliate
 	// is_paid_partnership
@@ -84,4 +111,8 @@ type EmbedResponse struct {
 
 func (s EmbedResponse) IsEmpty() bool {
 	return s.Media.Id == ""
+}
+
+func (s EmbedResponse) GetCaption() string {
+	return s.Media.Caption.Edges[0].Node.Text
 }
