@@ -50,11 +50,10 @@ type Owner struct {
 type SliderItems struct {
 	Edges []struct {
 		Node struct {
-			Type             string     `json:"__typename"`
 			Id               string     `json:"id"`
 			Shortcode        string     `json:"shortcode"`
+			Type             string     `json:"__typename"`
 			ProductType      string     `json:"product_type"`
-			CommenterCount   uint64     `json:"commenter_count"`
 			Dimensions       Dimensions `json:"dimensions"`
 			DisplayURL       string     `json:"display_url"`
 			DisplayResources []Resource `json:"display_resources"`
@@ -113,6 +112,17 @@ func (s EmbedResponse) IsEmpty() bool {
 	return s.Media.Id == ""
 }
 
+func (s EmbedResponse) IsVideo() bool {
+	return s.Media.IsVideo
+}
+
 func (s EmbedResponse) GetCaption() string {
 	return s.Media.Caption.Edges[0].Node.Text
+}
+
+func (s EmbedResponse) ExtractMediaURL() string {
+	if s.Media.IsVideo {
+		return s.Media.VideoURL
+	}
+	return s.Media.DisplayURL
 }
