@@ -1,6 +1,8 @@
 package main
 
 import (
+	"fmt"
+
 	"github.com/feelthecode/instagramrobot/src/instagram"
 )
 
@@ -11,8 +13,9 @@ func main() {
 
 	response, err := ig.GetPostWithCode(code)
 	if err != nil {
+		fmt.Print(err.Error())
 		return
 	}
 
-	_ = response
+	fmt.Printf("%+v\n", response)
 }
