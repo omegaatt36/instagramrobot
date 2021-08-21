@@ -1,26 +1,35 @@
 package main
 
 import (
-	"fmt"
-
 	"github.com/feelthecode/instagramrobot/src/config"
-	"github.com/feelthecode/instagramrobot/src/instagram"
+	"github.com/feelthecode/instagramrobot/src/telegram"
 	"github.com/feelthecode/instagramrobot/src/utils"
+
+	log "github.com/sirupsen/logrus"
 )
 
 func main() {
 	utils.RegisterLogger()
 	config.Load()
 
-	code := "CSft2G5pFgr"
-
-	ig := instagram.API{}
-
-	response, err := ig.GetPostWithCode(code)
-	if err != nil {
-		fmt.Print(err.Error())
-		return
+	if config.IsDevelopment() {
+		log.SetLevel(log.DebugLevel)
+	} else {
+		log.SetLevel(log.InfoLevel)
 	}
 
-	fmt.Printf("%+v\n", response)
+	bot := telegram.Bot{}
+	bot.Register()
+	bot.Start()
+	<-make(chan string)
+
+	// ig := instagram.API{}
+	// code := "CSft2G5pFgr"
+	// response, err := ig.GetPostWithCode(code)
+	// if err != nil {
+	// 	fmt.Print(err.Error())
+	// 	return
+	// }
+
+	// fmt.Printf("%+v\n", response)
 }
