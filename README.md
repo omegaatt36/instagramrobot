@@ -11,7 +11,7 @@
 <!-- [START description] -->
 
 <a href="https://github.com/feelthecode/instagramrobot">
-  <img src="https://raw.githubusercontent.com/feelthecode/instagramrobot/main/images/instagram-logo.svg" width="80" align="right" />
+  <img src="https://raw.githubusercontent.com/feelthecode/instagramrobot/main/images/ig-logo.svg" width="80" align="right" />
 </a>
 <a href="https://github.com/feelthecode/instagramrobot">
   <img src="https://raw.githubusercontent.com/feelthecode/instagramrobot/main/images/telegram-logo.svg" width="80" align="right" />
