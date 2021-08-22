@@ -2,6 +2,7 @@
 
 <!-- [START badges] -->
 
+<a href="https://goreportcard.com/report/github.com/feelthecode/instagramrobot"><img src="https://goreportcard.com/badge/github.com/feelthecode/instagramrobot" alt="Go report" /></a>
 <a href="https://www.codefactor.io/repository/github/feelthecode/instagramrobot"><img src="https://www.codefactor.io/repository/github/feelthecode/instagramrobot/badge" alt="CodeFactor" /></a>
 
 <!-- [END badges] -->
