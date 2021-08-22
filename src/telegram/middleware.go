@@ -5,6 +5,7 @@ import (
 	"net/url"
 	"time"
 
+	"github.com/feelthecode/instagramrobot/src/helpers"
 	log "github.com/sirupsen/logrus"
 	tb "gopkg.in/tucnak/telebot.v2"
 )
@@ -25,7 +26,7 @@ func (t *Bot) getMiddleware() *tb.MiddlewarePoller {
 
 		for _, entity := range update.Message.Entities {
 			if entity.Type == tb.EntityURL {
-				link := substr(update.Message.Text, entity.Offset, entity.Length)
+				link := helpers.SubString(update.Message.Text, entity.Offset, entity.Length)
 
 				// validate extracted link
 				validLink, err := url.ParseRequestURI(link)
@@ -40,18 +41,4 @@ func (t *Bot) getMiddleware() *tb.MiddlewarePoller {
 
 		return true
 	})
-}
-
-func substr(input string, start int, length int) string {
-	asRunes := []rune(input)
-
-	if start >= len(asRunes) {
-		return ""
-	}
-
-	if start+length > len(asRunes) {
-		length = len(asRunes) - start
-	}
-
-	return string(asRunes[start : start+length])
 }
