@@ -2,6 +2,7 @@ package telegram
 
 import (
 	"fmt"
+	"time"
 
 	"github.com/feelthecode/instagramrobot/src/config"
 	log "github.com/sirupsen/logrus"
@@ -13,9 +14,13 @@ type Bot struct {
 }
 
 func (t *Bot) Register() error {
+	poller := &tb.LongPoller{
+		Timeout:        15 * time.Second,
+		AllowedUpdates: []string{"message"},
+	}
 	b, err := tb.NewBot(tb.Settings{
 		Token:   config.C.BOT_TOKEN,
-		Poller:  t.getMiddleware(),
+		Poller:  tb.NewMiddlewarePoller(poller, t.middleware),
 		Verbose: config.IsDevelopment(),
 	})
 	if err != nil {
@@ -37,6 +42,7 @@ func (t *Bot) Register() error {
 
 func (t *Bot) registerCommands() {
 	t.b.Handle("/start", t.start)
+	t.b.Handle(tb.OnText, t.links)
 }
 
 func (t *Bot) Start() {
