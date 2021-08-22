@@ -27,5 +27,5 @@ type Media struct {
 	IsVideo   bool        `json:"is_video"`
 	Url       string      `json:"url"`
 	Items     []MediaItem `json:"items"`
-	TakenAt   int64       `json:"taken_at"` // Timestmap
+	TakenAt   int64       `json:"taken_at"` // Timestamp
 }
