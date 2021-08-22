@@ -21,7 +21,6 @@ func main() {
 	bot := telegram.Bot{}
 	bot.Register()
 	bot.Start()
-	<-make(chan string)
 
 	// ig := instagram.API{}
 	// code := "CSft2G5pFgr"
