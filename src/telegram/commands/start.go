@@ -1,6 +1,7 @@
 package commands
 
 import (
+	log "github.com/sirupsen/logrus"
 	tb "gopkg.in/tucnak/telebot.v2"
 )
 
@@ -11,5 +12,8 @@ type StartCommand struct {
 // The entry point for the incoming update
 func (s *StartCommand) Handler(m *tb.Message) {
 	// Ignore channels and groups
-	s.B.Reply(m, "Hello!")
+	_, err := s.B.Reply(m, "Hello!")
+	if err != nil {
+		log.Errorf("Couldn't sent the start command response: %v", err)
+	}
 }

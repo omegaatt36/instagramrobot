@@ -2,6 +2,7 @@ package middleware
 
 import (
 	"github.com/feelthecode/instagramrobot/src/telegram/utils"
+	log "github.com/sirupsen/logrus"
 	tb "gopkg.in/tucnak/telebot.v2"
 )
 
@@ -12,7 +13,9 @@ type Middleware struct {
 func (m *Middleware) Get(update *tb.Update) bool {
 	if !update.Message.Private() {
 		utils.ReplyError(m.B, update.Message, "I'm limited to private chats!")
-		m.B.Leave(update.Message.Chat)
+		if err := m.B.Leave(update.Message.Chat); err != nil {
+			log.WithField("chat_id", update.Message.Chat.ID).Errorf("Couldn't leave the chat: %v", err)
+		}
 		return false
 	}
 

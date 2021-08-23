@@ -70,5 +70,5 @@ func (a *API) checkScriptForJSON(scriptContent string) {
 	res := strings.Replace(scriptContent, validateText, "", 1)
 	res = strings.Replace(res, ");", "", 1)
 
-	json.Unmarshal([]byte(res), &a.embedResponse)
+	_ = json.Unmarshal([]byte(res), &a.embedResponse)
 }

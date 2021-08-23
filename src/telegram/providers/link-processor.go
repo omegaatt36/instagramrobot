@@ -52,7 +52,7 @@ func (l *linkProcessor) ProcessLink(link string) {
 	}).Infof("Processing link")
 
 	// TODO: process downloading the shortcode
-	l.bot.Reply(l.msg, fmt.Sprintf("processing path %v", url.Path))
+	_, _ = l.bot.Reply(l.msg, fmt.Sprintf("processing path %v", url.Path))
 }
 
 // Protect user from sending bulk links in a single message.

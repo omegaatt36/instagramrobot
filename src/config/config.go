@@ -39,8 +39,14 @@ func Load() {
 	if err := viper.ReadInConfig(); err != nil {
 		// log.Warn(err)
 		log.Info("Config loaded from env vars")
-		viper.BindEnv("APP_ENV")
-		viper.BindEnv("BOT_TOKEN")
+
+		// TODO: refactor with foreach
+		if err := viper.BindEnv("APP_ENV"); err != nil {
+			log.Fatal("Couldn't bind the APP_ENV env var")
+		}
+		if err := viper.BindEnv("BOT_TOKEN"); err != nil {
+			log.Fatal("Couldn't bind the BOT_TOKEN env var")
+		}
 	}
 
 	var c *config

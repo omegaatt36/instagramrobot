@@ -19,7 +19,9 @@ func main() {
 	}
 
 	bot := telegram.Bot{}
-	bot.Register()
+	if err := bot.Register(); err != nil {
+		log.Fatalf("Couldn't register the Telegram bot: %v", err)
+	}
 	bot.Start()
 
 	// ig := instagram.API{}
