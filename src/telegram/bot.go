@@ -1,11 +1,11 @@
 package telegram
 
 import (
-	"fmt"
 	"time"
 
 	"github.com/feelthecode/instagramrobot/src/config"
 	log "github.com/sirupsen/logrus"
+	"github.com/spf13/viper"
 	tb "gopkg.in/tucnak/telebot.v2"
 )
 
@@ -19,12 +19,13 @@ func (t *Bot) Register() error {
 		AllowedUpdates: []string{"message"},
 	}
 	b, err := tb.NewBot(tb.Settings{
-		Token:   config.C.BOT_TOKEN,
+		Token:   viper.GetString("BOT_TOKEN"),
 		Poller:  tb.NewMiddlewarePoller(poller, t.middleware),
 		Verbose: config.IsDevelopment(),
 	})
 	if err != nil {
-		return fmt.Errorf("couldn't create the Telegram bot instance: %v", err)
+		log.Error("Couldn't create the Telegram bot instance")
+		log.Fatal(err)
 	}
 	t.b = b
 	log.WithFields(log.Fields{
