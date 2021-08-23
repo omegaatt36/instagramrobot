@@ -15,8 +15,13 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [ubuntu-latest, windows-latest, macOS-latest]
-        go: ["1.16"]
+        os: [ubuntu-latest, macos-latest]
+        go: ["1.14", "1.15", "1.16"]
+    env:
+      VERBOSE: 1
+      GOFLAGS: -mod=readonly
+      GOPROXY: https://proxy.golang.org
+
     steps:
       - name: Set up Go ${{ matrix.go }}
         uses: actions/setup-go@v2.1.3
@@ -34,12 +39,10 @@ jobs:
           # * Module download cache
           # * Build cache (Linux)
           # * Build cache (Mac)
-          # * Build cache (Windows)
           path: |
             ~/go/pkg/mod
             ~/.cache/go-build
             ~/Library/Caches/go-build
-            %LocalAppData%\go-build
           key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
           restore-keys: |
             ${{ runner.os }}-go-
