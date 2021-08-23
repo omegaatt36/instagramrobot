@@ -15,7 +15,7 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [ubuntu-latest, macos-latest]
+        os: [ubuntu-latest]
         go: ["1.14", "1.15", "1.16"]
     env:
       VERBOSE: 1
@@ -38,11 +38,9 @@ jobs:
           # In order:
           # * Module download cache
           # * Build cache (Linux)
-          # * Build cache (Mac)
           path: |
             ~/go/pkg/mod
             ~/.cache/go-build
-            ~/Library/Caches/go-build
           key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
           restore-keys: |
             ${{ runner.os }}-go-
