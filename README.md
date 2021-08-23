@@ -19,11 +19,10 @@
 
 <!-- [START description] -->
 
-<a href="https://github.com/feelthecode/instagramrobot">
-  <img src="https://raw.githubusercontent.com/feelthecode/instagramrobot/main/images/ig-logo.svg" width="60" align="right" />
-</a>
-<a href="https://github.com/feelthecode/instagramrobot">
-  <img src="https://raw.githubusercontent.com/feelthecode/instagramrobot/main/images/telegram-logo.svg" width="60" align="right" />
+<a href="https://github.com/feelthecode/instagramrobot" >
+  <img align="right" src="https://raw.githubusercontent.com/feelthecode/instagramrobot/main/images/ig-logo.svg" width="80" />
+  <img align="right" src="https://raw.githubusercontent.com/feelthecode/instagramrobot/main/images/telegram-logo.svg" width="80" />
+  <img align="right" src="https://raw.githubusercontent.com/feelthecode/instagramrobot/main/images/golang-logo.svg" height="80" />
 </a>
 
 > [InstagramRobot](https://github.com/feelthecode/instagramrobot) is a bot based on [Telegram Bot API](https://core.telegram.org/bots/api) written in [Golang](https://golang.org/) that allows users to download Instagram photos, videos, and albums without providing their credentials.
