@@ -5,6 +5,7 @@ import (
 
 	"github.com/feelthecode/instagramrobot/src/config"
 	"github.com/feelthecode/instagramrobot/src/telegram/commands"
+	"github.com/feelthecode/instagramrobot/src/telegram/events"
 	"github.com/feelthecode/instagramrobot/src/telegram/middleware"
 	log "github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
@@ -49,11 +50,13 @@ func (t *Bot) Register() error {
 }
 
 func (t *Bot) registerCommands() {
-	start := commands.Start{B: t.b}
+	// Commands
+	start := commands.StartCommand{B: t.b}
 	t.b.Handle("/start", start.Handler)
 
-	links := commands.Links{B: t.b}
-	t.b.Handle(tb.OnText, links.Handler)
+	// Events
+	text := events.TextHandler{B: t.b}
+	t.b.Handle(tb.OnText, text.Handler)
 }
 
 func (t *Bot) Start() {

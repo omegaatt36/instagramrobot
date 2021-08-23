@@ -1,4 +1,4 @@
-package commands
+package events
 
 import (
 	"fmt"
@@ -10,22 +10,20 @@ import (
 	tb "gopkg.in/tucnak/telebot.v2"
 )
 
-// TODO: rename to text
-// TODO: move to events folder
-// Links handler
-type Links struct {
+// Text handler
+type TextHandler struct {
 	B *tb.Bot // Bot instance
 }
 
 // The entry point for the incoming update
-func (l *Links) Handler(m *tb.Message) {
+func (l *TextHandler) Handler(m *tb.Message) {
 	links := helpers.ExtractLinksFromString(m.Text)
 	l.processLinks(links, m)
 }
 
 // Gets list of links from user message text
 // and processes each one of them one by one.
-func (l *Links) processLinks(links []string, m *tb.Message) {
+func (l *TextHandler) processLinks(links []string, m *tb.Message) {
 	for index, link := range links {
 		if spam := l.checkIndexForSpam(index, m); spam {
 			break
@@ -36,7 +34,7 @@ func (l *Links) processLinks(links []string, m *tb.Message) {
 }
 
 // Process a single link
-func (l *Links) processLink(link string, m *tb.Message) {
+func (l *TextHandler) processLink(link string, m *tb.Message) {
 	// Convert link to URL object
 	url, err := url.ParseRequestURI(link)
 
@@ -70,7 +68,7 @@ func (l *Links) processLink(link string, m *tb.Message) {
 }
 
 // Protect user from sending bulk links in a single message.
-func (l *Links) checkIndexForSpam(index int, m *tb.Message) bool {
+func (l *TextHandler) checkIndexForSpam(index int, m *tb.Message) bool {
 	// TODO: load from Config
 	AllowedLinksPerMessage := 3
 	if index == AllowedLinksPerMessage {
