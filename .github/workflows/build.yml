@@ -30,8 +30,19 @@ jobs:
       - name: Cache modules
         uses: actions/cache@v2.1.6
         with:
-          path: ~/go/pkg/mod
+          # In order:
+          # * Module download cache
+          # * Build cache (Linux)
+          # * Build cache (Mac)
+          # * Build cache (Windows)
+          path: |
+            ~/go/pkg/mod
+            ~/.cache/go-build
+            ~/Library/Caches/go-build
+            %LocalAppData%\go-build
           key: ${{ runner.OS }}-go-${{ hashFiles('**/go.sum') }}
+          restore-keys: |
+            ${{ runner.os }}-go-
 
       - name: Build
         run: go build
