@@ -1,4 +1,4 @@
-package telegram
+package commands
 
 import (
 	"fmt"
@@ -7,10 +7,15 @@ import (
 
 	tb "gopkg.in/tucnak/telebot.v2"
 
+	"github.com/feelthecode/instagramrobot/src/telegram/utils"
 	log "github.com/sirupsen/logrus"
 )
 
-func (t *Bot) links(m *tb.Message) {
+type Links struct {
+	B *tb.Bot
+}
+
+func (l *Links) Get(m *tb.Message) {
 	// Ignore channels and groups
 	r := regexp.MustCompile(`(http|ftp|https)://([\w_-]+(?:(?:\.[\w_-]+)+))([\w.,@?^=%&:/~+#-]*[\w@?^=%&/~+#-])?`)
 	matches := r.FindAllString(m.Text, -1)
@@ -20,7 +25,7 @@ func (t *Bot) links(m *tb.Message) {
 		AllowedLinksPerMessage := 3
 		if index == AllowedLinksPerMessage {
 			// TODO: error helper
-			t.ReplyError(m, fmt.Sprintf("I can't process more than %c links per message.", AllowedLinksPerMessage))
+			utils.ReplyError(l.B, m, fmt.Sprintf("I can't process more than %c links per message.", AllowedLinksPerMessage))
 			break
 		}
 
@@ -30,13 +35,13 @@ func (t *Bot) links(m *tb.Message) {
 		// Validate URL
 		if err != nil || url == nil {
 			// TODO: error helper
-			t.ReplyError(m, fmt.Sprintf("I couldn't parse the [%v] link.", link))
+			utils.ReplyError(l.B, m, fmt.Sprintf("I couldn't parse the [%v] link.", link))
 			continue
 		}
 
 		// Validate HOST in the URL (only instagram.com is allowed)
 		if url.Host != "instagram.com" {
-			t.ReplyError(m, fmt.Sprintf("I can only process links from [instagram.com] not [%v].", url.Host))
+			utils.ReplyError(l.B, m, fmt.Sprintf("I can only process links from [instagram.com] not [%v].", url.Host))
 			continue
 		}
 
@@ -54,6 +59,6 @@ func (t *Bot) links(m *tb.Message) {
 		}).Infof("Processing link")
 
 		// TODO: process downloading the shortcode
-		t.b.Reply(m, fmt.Sprintf("processing path %v", url.Path))
+		l.B.Reply(m, fmt.Sprintf("processing path %v", url.Path))
 	}
 }

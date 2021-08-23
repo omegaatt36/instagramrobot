@@ -4,6 +4,8 @@ import (
 	"time"
 
 	"github.com/feelthecode/instagramrobot/src/config"
+	"github.com/feelthecode/instagramrobot/src/telegram/commands"
+	"github.com/feelthecode/instagramrobot/src/telegram/middleware"
 	log "github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
 	tb "gopkg.in/tucnak/telebot.v2"
@@ -18,9 +20,14 @@ func (t *Bot) Register() error {
 		Timeout:        15 * time.Second,
 		AllowedUpdates: []string{"message"},
 	}
+	// Generate middleware
+	m := middleware.Middleware{
+		B: t.b,
+	}
+
 	b, err := tb.NewBot(tb.Settings{
 		Token:   viper.GetString("BOT_TOKEN"),
-		Poller:  tb.NewMiddlewarePoller(poller, t.middleware),
+		Poller:  tb.NewMiddlewarePoller(poller, m.Get),
 		Verbose: config.IsDevelopment(),
 	})
 	if err != nil {
@@ -42,8 +49,11 @@ func (t *Bot) Register() error {
 }
 
 func (t *Bot) registerCommands() {
-	t.b.Handle("/start", t.start)
-	t.b.Handle(tb.OnText, t.links)
+	start := commands.Start{B: t.b}
+	t.b.Handle("/start", start.Get)
+
+	links := commands.Links{B: t.b}
+	t.b.Handle(tb.OnText, links.Get)
 }
 
 func (t *Bot) Start() {
