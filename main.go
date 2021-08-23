@@ -2,14 +2,14 @@ package main
 
 import (
 	"github.com/feelthecode/instagramrobot/src/config"
+	"github.com/feelthecode/instagramrobot/src/helpers"
 	"github.com/feelthecode/instagramrobot/src/telegram"
-	"github.com/feelthecode/instagramrobot/src/utils"
 
 	log "github.com/sirupsen/logrus"
 )
 
 func main() {
-	utils.RegisterLogger()
+	helpers.RegisterLogger()
 	config.Load()
 
 	if config.IsDevelopment() {
