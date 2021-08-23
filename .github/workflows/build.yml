@@ -1,4 +1,4 @@
-name: CI
+name: build
 
 on:
   push:
@@ -11,7 +11,7 @@ on:
 
 jobs:
   build:
-    name: Build on ${{ matrix.os }} with Go ${{ matrix.go }}
+    name: ${{ matrix.os }} w/ Go ${{ matrix.go }}
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
@@ -47,12 +47,6 @@ jobs:
 
       - name: Build
         run: go build
-
-    # - name: golangci-lint
-    #   uses: golangci/golangci-lint-action@v2.5.2
-    #   if: matrix.os == 'ubuntu-latest'
-    #   with:
-    #     version: v1.32.1
 
     # - name: Test
     #   run: go test -p 1 -coverpkg ./... -covermode atomic -coverprofile coverage.txt ./...
