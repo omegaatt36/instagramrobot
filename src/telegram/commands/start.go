@@ -5,10 +5,11 @@ import (
 )
 
 type Start struct {
-	B *tb.Bot
+	B *tb.Bot // Bot instance
 }
 
-func (s *Start) Get(m *tb.Message) {
+// The entry point for the incoming update
+func (s *Start) Handler(m *tb.Message) {
 	// Ignore channels and groups
 	s.B.Reply(m, "Hello!")
 }

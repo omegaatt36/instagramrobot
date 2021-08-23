@@ -50,10 +50,10 @@ func (t *Bot) Register() error {
 
 func (t *Bot) registerCommands() {
 	start := commands.Start{B: t.b}
-	t.b.Handle("/start", start.Get)
+	t.b.Handle("/start", start.Handler)
 
 	links := commands.Links{B: t.b}
-	t.b.Handle(tb.OnText, links.Get)
+	t.b.Handle(tb.OnText, links.Handler)
 }
 
 func (t *Bot) Start() {

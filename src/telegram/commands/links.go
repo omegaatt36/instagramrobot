@@ -3,62 +3,79 @@ package commands
 import (
 	"fmt"
 	"net/url"
-	"regexp"
 
-	tb "gopkg.in/tucnak/telebot.v2"
-
+	"github.com/feelthecode/instagramrobot/src/helpers"
 	"github.com/feelthecode/instagramrobot/src/telegram/utils"
 	log "github.com/sirupsen/logrus"
+	tb "gopkg.in/tucnak/telebot.v2"
 )
 
+// TODO: rename to text
+// TODO: move to events folder
+// Links handler
 type Links struct {
-	B *tb.Bot
+	B *tb.Bot // Bot instance
 }
 
-func (l *Links) Get(m *tb.Message) {
-	// Ignore channels and groups
-	r := regexp.MustCompile(`(http|ftp|https)://([\w_-]+(?:(?:\.[\w_-]+)+))([\w.,@?^=%&:/~+#-]*[\w@?^=%&/~+#-])?`)
-	matches := r.FindAllString(m.Text, -1)
-	for index, link := range matches {
-		// Protect user from sending bulk links in a single message.
-		// TODO: load from Config
-		AllowedLinksPerMessage := 3
-		if index == AllowedLinksPerMessage {
-			// TODO: error helper
-			utils.ReplyError(l.B, m, fmt.Sprintf("I can't process more than %c links per message.", AllowedLinksPerMessage))
+// The entry point for the incoming update
+func (l *Links) Handler(m *tb.Message) {
+	links := helpers.ExtractLinksFromString(m.Text)
+	l.processLinks(links, m)
+}
+
+// Gets list of links from user message text
+// and processes each one of them one by one.
+func (l *Links) processLinks(links []string, m *tb.Message) {
+	for index, link := range links {
+		if spam := l.checkIndexForSpam(index, m); spam {
 			break
 		}
 
-		// Convert link to URL object
-		url, err := url.ParseRequestURI(link)
-
-		// Validate URL
-		if err != nil || url == nil {
-			// TODO: error helper
-			utils.ReplyError(l.B, m, fmt.Sprintf("I couldn't parse the [%v] link.", link))
-			continue
-		}
-
-		// Validate HOST in the URL (only instagram.com is allowed)
-		if url.Host != "instagram.com" {
-			utils.ReplyError(l.B, m, fmt.Sprintf("I can only process links from [instagram.com] not [%v].", url.Host))
-			continue
-		}
-
-		log.Infof("link %+v", url.Path)
-
-		// TODO: Validate URL path (only "/p/" or "/tv/" are acceptable)
-
-		// TODO: Extract shortcode
-
-		// TODO: Validate shortcode
-
-		log.WithFields(log.Fields{
-			"chat_id": m.Sender.ID,
-			"link":    url,
-		}).Infof("Processing link")
-
-		// TODO: process downloading the shortcode
-		l.B.Reply(m, fmt.Sprintf("processing path %v", url.Path))
+		l.processLink(link, m)
 	}
+}
+
+// Process a single link
+func (l *Links) processLink(link string, m *tb.Message) {
+	// Convert link to URL object
+	url, err := url.ParseRequestURI(link)
+
+	// Validate URL
+	if err != nil {
+		utils.ReplyError(l.B, m, fmt.Sprintf("I couldn't parse the [%v] link.", link))
+		return
+	}
+
+	// Validate HOST in the URL (only instagram.com is allowed)
+	if url.Host != "instagram.com" {
+		utils.ReplyError(l.B, m, fmt.Sprintf("I can only process links from [instagram.com] not [%v].", url.Host))
+		return
+	}
+
+	log.Infof("link %+v", url.Path)
+
+	// TODO: Validate URL path (only "/p/" or "/tv/" are acceptable)
+
+	// TODO: Extract shortcode
+
+	// TODO: Validate shortcode
+
+	log.WithFields(log.Fields{
+		"chat_id": m.Sender.ID,
+		"link":    url,
+	}).Infof("Processing link")
+
+	// TODO: process downloading the shortcode
+	l.B.Reply(m, fmt.Sprintf("processing path %v", url.Path))
+}
+
+// Protect user from sending bulk links in a single message.
+func (l *Links) checkIndexForSpam(index int, m *tb.Message) bool {
+	// TODO: load from Config
+	AllowedLinksPerMessage := 3
+	if index == AllowedLinksPerMessage {
+		utils.ReplyError(l.B, m, fmt.Sprintf("can't process more than %c links per message", AllowedLinksPerMessage))
+		return true
+	}
+	return false
 }
