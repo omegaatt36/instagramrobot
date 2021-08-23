@@ -3,6 +3,7 @@ package providers
 import (
 	"fmt"
 	"net/url"
+	"regexp"
 
 	"github.com/feelthecode/instagramrobot/src/telegram/utils"
 	log "github.com/sirupsen/logrus"
@@ -33,26 +34,33 @@ func (l *linkProcessor) ProcessLink(link string) {
 	}
 
 	// Validate HOST in the URL (only instagram.com is allowed)
-	if url.Host != "instagram.com" {
+	if url.Host != "instagram.com" && url.Host != "www.instagram.com" {
 		utils.ReplyError(l.bot, l.msg, fmt.Sprintf("I can only process links from [instagram.com] not [%v].", url.Host))
 		return
 	}
 
 	log.Infof("link %+v", url.Path)
 
-	// TODO: Validate URL path (only "/p/" or "/tv/" are acceptable)
-
-	// TODO: Extract shortcode
-
-	// TODO: Validate shortcode
+	// TODO: move logic to the instagram package
+	// Validate URL path (only "/p/" or "/tv/" are acceptable)
+	// Validate shortcode
+	re := regexp.MustCompile(`(p|tv|reel)\/([A-Za-z0-9-_]+)`)
+	values := re.FindStringSubmatch(url.Path)
+	log.Infof("%+v %v", values, len(values))
+	if len(values) != 3 {
+		utils.ReplyError(l.bot, l.msg, "The link structure is invalid")
+		return
+	}
+	// Extract shortcode
+	shortcode := values[2]
 
 	log.WithFields(log.Fields{
-		"chat_id": l.msg.Sender.ID,
-		"link":    url,
+		"chat_id":   l.msg.Sender.ID,
+		"shortcode": shortcode,
 	}).Infof("Processing link")
 
 	// TODO: process downloading the shortcode
-	_, _ = l.bot.Reply(l.msg, fmt.Sprintf("processing path %v", url.Path))
+	_, _ = l.bot.Reply(l.msg, fmt.Sprintf("processing shortcode %v", shortcode))
 }
 
 // Protect user from sending bulk links in a single message.
