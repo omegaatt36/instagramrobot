@@ -38,7 +38,7 @@ func Load() {
 
 	if err := viper.ReadInConfig(); err != nil {
 		// log.Warn(err)
-		log.Info("Reading config from environment variables")
+		log.Info("Config loaded from env vars")
 		viper.BindEnv("APP_ENV")
 		viper.BindEnv("BOT_TOKEN")
 	}
