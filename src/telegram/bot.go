@@ -55,11 +55,11 @@ func (t *Bot) registerCommands() {
 	t.b.Handle("/start", start.Handler)
 
 	// Events
-	text := events.TextHandler{B: t.b}
+	text := events.TextHandler(t.b)
 	t.b.Handle(tb.OnText, text.Handler)
 }
 
 func (t *Bot) Start() {
-	log.Warn("Telegram bot started")
+	log.Warn("Telegram bot starting")
 	t.b.Start()
 }
