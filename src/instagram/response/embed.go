@@ -56,29 +56,39 @@ type Owner struct {
 	Timeline          OwnerTimeline `json:"edge_owner_to_timeline_media"` // Timeline feeds of the User
 }
 
+type SliderItemNode struct {
+	Id               string     `json:"id"`                // Unique ID of the Media
+	Shortcode        string     `json:"shortcode"`         // Unique shortcode of the Media
+	Type             string     `json:"__typename"`        // Type of the Media
+	ProductType      string     `json:"product_type"`      // Product type of the Media
+	Dimensions       Dimensions `json:"dimensions"`        // Dimension of the Media
+	DisplayURL       string     `json:"display_url"`       // URL of the Media (resolution is dynamic)
+	DisplayResources []Resource `json:"display_resources"` // Resource of the Media
+
+	IsVideo        bool   `json:"is_video"`         // Is type of the Media equals to video
+	Title          string `json:"title"`            // The video title
+	VideoURL       string `json:"video_url"`        // Direct URL to the Video
+	VideoViewCount uint64 `json:"video_view_count"` // The number of times Video has been viewed
+
+	// clips_music_attribution_info
+	// media_overlay_info
+	// sharing_friction_info
+}
+
+// ExtractMediaURL will extract the Media URL automatically based on Media type (video or image)
+func (s SliderItemNode) ExtractMediaURL() string {
+	if s.IsVideo {
+		return s.VideoURL
+	}
+	return s.DisplayURL
+}
+
 // List of slider items
 type SliderItems struct {
 	// List of Edge which contains multiple nodes
 	Edges []struct {
 		// A single node which contains Media item
-		Node struct {
-			Id               string     `json:"id"`                // Unique ID of the Media
-			Shortcode        string     `json:"shortcode"`         // Unique shortcode of the Media
-			Type             string     `json:"__typename"`        // Type of the Media
-			ProductType      string     `json:"product_type"`      // Product type of the Media
-			Dimensions       Dimensions `json:"dimensions"`        // Dimension of the Media
-			DisplayURL       string     `json:"display_url"`       // URL of the Media (resolution is dynamic)
-			DisplayResources []Resource `json:"display_resources"` // Resource of the Media
-
-			IsVideo        bool   `json:"is_video"`         // Is type of the Media equals to video
-			Title          string `json:"title"`            // The video title
-			VideoURL       string `json:"video_url"`        // Direct URL to the Video
-			VideoViewCount uint64 `json:"video_view_count"` // The number of times Video has been viewed
-
-			// clips_music_attribution_info
-			// media_overlay_info
-			// sharing_friction_info
-		} `json:"node"`
+		Node SliderItemNode `json:"node"`
 	} `json:"edges"`
 }
 
@@ -137,7 +147,7 @@ func (s EmbedResponse) GetCaption() string {
 	return s.Media.Caption.Edges[0].Node.Text
 }
 
-// Extract the Media URL automatically based on Media type (video or image)
+// ExtractMediaURL will extract the Media URL automatically based on Media type (video or image)
 func (s EmbedResponse) ExtractMediaURL() string {
 	if s.Media.IsVideo {
 		return s.Media.VideoURL

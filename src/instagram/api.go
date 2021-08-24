@@ -11,6 +11,7 @@ import (
 	browser "github.com/EDDYCJY/fake-useragent"
 	goQuery "github.com/PuerkitoBio/goquery"
 	"github.com/feelthecode/instagramrobot/src/instagram/response"
+	"github.com/feelthecode/instagramrobot/src/instagram/transform"
 )
 
 type API struct {
@@ -18,7 +19,7 @@ type API struct {
 }
 
 // TODO change response type
-func (a *API) GetPostWithCode(code string) (response.EmbedResponse, error) {
+func (a *API) GetPostWithCode(code string) (transform.Media, error) {
 	// TODO: validate code
 
 	URL := fmt.Sprintf("https://www.instagram.com/p/%v/embed/captioned/", code)
@@ -39,7 +40,7 @@ func (a *API) GetPostWithCode(code string) (response.EmbedResponse, error) {
 	if res.StatusCode != 200 {
 		// TODO: use logger
 		log.Fatalf("status code error: %d %s", res.StatusCode, res.Status)
-		return a.embedResponse, fmt.Errorf("Instagram returned %v error.", res.Status)
+		return transform.Media{}, fmt.Errorf("Instagram returned %v error.", res.Status)
 	}
 
 	// Load the HTML document
@@ -53,13 +54,16 @@ func (a *API) GetPostWithCode(code string) (response.EmbedResponse, error) {
 		a.checkScriptForJSON(s.Text())
 	})
 
+	// If the method one which is JSON parsing didn't fail
 	if !a.embedResponse.IsEmpty() {
-		// TODO use method two
-		return a.embedResponse, nil
+		// Transform the Embed response and return
+		return transform.FromEmbedResponse(a.embedResponse), nil
 	}
 
-	// Try second method by HTML parse body
-	return a.embedResponse, errors.New("couldn't fetch the media")
+	// TODO: Try second method by HTML body parsing
+
+	// If every two methods have failed, then return an error
+	return transform.Media{}, errors.New("failed to fetch the post\nthe page might be \"private\", or\nthe link is completely wrong")
 }
 
 func (a *API) checkScriptForJSON(scriptContent string) {

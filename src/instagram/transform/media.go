@@ -1,5 +1,7 @@
 package transform
 
+import "github.com/feelthecode/instagramrobot/src/instagram/response"
+
 type Owner struct {
 	Id                string `json:"id"`
 	ProfilePictureURL string `json:"profile_pic_url"`
@@ -28,4 +30,29 @@ type Media struct {
 	Url       string      `json:"url"`
 	Items     []MediaItem `json:"items"`
 	TakenAt   int64       `json:"taken_at"` // Timestamp
+}
+
+func FromEmbedResponse(embed response.EmbedResponse) Media {
+	media := Media{
+		Id:        embed.Media.Id,
+		Shortcode: embed.Media.Shortcode,
+		Type:      embed.Media.Type,
+		Comments:  embed.Media.Comments.Count,
+		Likes:     embed.Media.Likes.Count,
+		Url:       embed.ExtractMediaURL(),
+		TakenAt:   embed.Media.TakenAt.Unix(),
+		IsVideo:   embed.IsVideo(),
+		Caption:   embed.GetCaption(),
+	}
+
+	for _, item := range embed.Media.SliderItems.Edges {
+		media.Items = append(media.Items, MediaItem{
+			Id:        item.Node.Id,
+			Shortcode: item.Node.Shortcode,
+			Type:      item.Node.Type,
+			Url:       item.Node.ExtractMediaURL(),
+		})
+	}
+
+	return media
 }

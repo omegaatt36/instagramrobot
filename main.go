@@ -23,14 +23,4 @@ func main() {
 		log.Fatalf("Couldn't register the Telegram bot: %v", err)
 	}
 	bot.Start()
-
-	// ig := instagram.API{}
-	// code := "CSft2G5pFgr"
-	// response, err := ig.GetPostWithCode(code)
-	// if err != nil {
-	// 	fmt.Print(err.Error())
-	// 	return
-	// }
-
-	// fmt.Printf("%+v\n", response)
 }

@@ -5,6 +5,7 @@ import (
 	"net/url"
 	"regexp"
 
+	"github.com/feelthecode/instagramrobot/src/instagram"
 	"github.com/feelthecode/instagramrobot/src/telegram/utils"
 	log "github.com/sirupsen/logrus"
 	tb "gopkg.in/tucnak/telebot.v2"
@@ -59,8 +60,16 @@ func (l *linkProcessor) ProcessLink(link string) {
 		"shortcode": shortcode,
 	}).Infof("Processing link")
 
-	// TODO: process downloading the shortcode
-	_, _ = l.bot.Reply(l.msg, fmt.Sprintf("processing shortcode %v", shortcode))
+	// Process fetching the shortcode from Instagram
+	ig := instagram.API{}
+	response, err := ig.GetPostWithCode(shortcode)
+	if err != nil {
+		utils.ReplyError(l.bot, l.msg, err.Error())
+		return
+	}
+
+	// TODO: Process response object and send proper content type
+	_, _ = l.bot.Reply(l.msg, response.Url)
 }
 
 // Protect user from sending bulk links in a single message.
