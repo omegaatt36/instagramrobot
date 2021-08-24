@@ -3,7 +3,6 @@ package providers
 import (
 	"fmt"
 	"net/url"
-	"regexp"
 
 	"github.com/feelthecode/instagramrobot/src/instagram"
 	"github.com/feelthecode/instagramrobot/src/telegram/utils"
@@ -41,20 +40,12 @@ func (l *linkProcessor) ProcessLink(link string) {
 		return
 	}
 
-	log.Infof("link %+v", url.Path)
-
-	// TODO: move logic to the instagram package
-	// Validate URL path (only "/p/" or "/tv/" are acceptable)
-	// Validate shortcode
-	re := regexp.MustCompile(`(p|tv|reel)\/([A-Za-z0-9-_]+)`)
-	values := re.FindStringSubmatch(url.Path)
-	log.Infof("%+v %v", values, len(values))
-	if len(values) != 3 {
-		utils.ReplyError(l.bot, l.msg, "The link structure is invalid")
+	// Extract shortcode
+	shortcode, err := instagram.ExtractShortcodeFromLink(url.Path)
+	if err != nil {
+		utils.ReplyError(l.bot, l.msg, err.Error())
 		return
 	}
-	// Extract shortcode
-	shortcode := values[2]
 
 	log.WithFields(log.Fields{
 		"chat_id":   l.msg.Sender.ID,
@@ -62,8 +53,7 @@ func (l *linkProcessor) ProcessLink(link string) {
 	}).Infof("Processing link")
 
 	// Process fetching the shortcode from Instagram
-	ig := instagram.API{}
-	response, err := ig.GetPostWithCode(shortcode)
+	response, err := instagram.GetPostWithCode(shortcode)
 	if err != nil {
 		utils.ReplyError(l.bot, l.msg, err.Error())
 		return
