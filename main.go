@@ -18,9 +18,8 @@ func main() {
 		log.SetLevel(log.InfoLevel)
 	}
 
-	bot := telegram.Bot{}
-	if err := bot.Register(); err != nil {
+	if err := telegram.Register(); err != nil {
 		log.Fatalf("Couldn't register the Telegram bot: %v", err)
 	}
-	bot.Start()
+	telegram.Start()
 }

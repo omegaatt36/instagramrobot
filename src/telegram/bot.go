@@ -12,21 +12,22 @@ import (
 	tb "gopkg.in/tucnak/telebot.v2"
 )
 
-type Bot struct {
-	b *tb.Bot
-}
+var b *tb.Bot
 
-func (t *Bot) Register() error {
+// Register will generate a fresh Telegram bot instance
+// and registers it's handler logics
+func Register() error {
 	poller := &tb.LongPoller{
 		Timeout:        15 * time.Second,
 		AllowedUpdates: []string{"message"},
 	}
+
 	// Generate middleware
 	m := middleware.Middleware{
-		B: t.b,
+		B: b,
 	}
 
-	b, err := tb.NewBot(tb.Settings{
+	bot, err := tb.NewBot(tb.Settings{
 		Token:   viper.GetString("BOT_TOKEN"),
 		Poller:  tb.NewMiddlewarePoller(poller, m.GetFilter),
 		Verbose: config.IsDevelopment(),
@@ -35,31 +36,32 @@ func (t *Bot) Register() error {
 		log.Error("Couldn't create the Telegram bot instance")
 		log.Fatal(err)
 	}
-	t.b = b
+	b = bot
 	log.WithFields(log.Fields{
 		"id":       b.Me.ID,
 		"username": b.Me.Username,
 		"title":    b.Me.FirstName,
 	}).Info("Telegram bot instance created")
 
-	t.registerCommands()
+	registerCommands()
 
 	// TODO: set bot commands
 
 	return nil
 }
 
-func (t *Bot) registerCommands() {
+func registerCommands() {
 	// Commands
-	start := commands.Start{B: t.b}
-	t.b.Handle("/start", start.Handler)
+	start := commands.Start{B: b}
+	b.Handle("/start", start.Handler)
 
 	// Events
-	text := events.TextHandler(t.b)
-	t.b.Handle(tb.OnText, text.Handler)
+	text := events.TextHandler(b)
+	b.Handle(tb.OnText, text.Handler)
 }
 
-func (t *Bot) Start() {
+// Start brings bot into motion by consuming incoming updates
+func Start() {
 	log.Warn("Telegram bot starting")
-	t.b.Start()
+	b.Start()
 }

@@ -10,7 +10,7 @@ type Start struct {
 	B *tb.Bot // Bot instance
 }
 
-// The entry point for the incoming update
+// Handler is the entry point for the incoming update
 func (s *Start) Handler(m *tb.Message) {
 	// Ignore channels and groups
 	_, err := s.B.Reply(m, "Hello!")
