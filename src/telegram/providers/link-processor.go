@@ -59,8 +59,12 @@ func (l *linkProcessor) ProcessLink(link string) {
 		return
 	}
 
-	// TODO: Process response object and send proper content type
-	_, _ = l.bot.Reply(l.msg, response.Url)
+	mediaSender := MediaSender{
+		bot:   l.bot,
+		msg:   l.msg,
+		media: response,
+	}
+	mediaSender.Send()
 }
 
 // Protect user from sending bulk links in a single message.
