@@ -34,13 +34,13 @@
 -   [Installing](#installing)
 -   [Configuration](#configuration)
 -   [Installing via Docker](#installing-via-docker)
-    -   [Building Docker container](#building-docker-container)
-    -   [Running Docker container](#running-docker-container)
+    -   [Building the container](#building-the-container)
+    -   [Running the container](#running-the-container)
 -   [Installing as a service](#installing-as-a-service)
     -   [Build the application](#build-the-application)
-    -   [Register service](#register-service)
-    -   [Enable service at boot](#enable-service-at-boot)
-    -   [Start service](#start-service)
+    -   [Register the service](#register-the-service)
+    -   [Enable the service at boot](#enable-the-service-at-boot)
+    -   [Start the service](#start-the-service)
 
 ## Installing
 
@@ -68,13 +68,13 @@ Containers allow a developer to package up an application with all of the parts 
 
 If you're not familiar with Docker, [this guide](https://docs.docker.com/get-started/) is a great point to start.
 
-### Building Docker container
+### Building the container
 
 ```
 docker-compose build
 ```
 
-### Running Docker container
+### Running the container
 
 ```
 docker-compose up
@@ -86,13 +86,13 @@ Make sure that the project files exists in the `/usr/local/instagramrobot` direc
 
 ### Build the application
 
-> If you don't have Go installed, [click here](https://golang.org/doc/install) and follow the instructions.
+> If you don't have Go installed, [click here](https://golang.org/doc/install) and follow its instructions.
 
 ```
 go build -o bin/igbot
 ```
 
-### Register service
+### Register the service
 
 Start by creating the `/etc/systemd/system/igbot.service` file.
 
@@ -111,15 +111,15 @@ RestartPreventExitStatus=23
 WantedBy=multi-user.target
 ```
 
-> Don't forget to replace the `[CONFIG_PATH]` with the correct path of configuration file, e.g `/usr/local/instagramrobot/etc/`.
+Don't forget to replace the `[CONFIG_PATH]` with the correct path of configuration file.
 
-### Enable service at boot
+### Enable the service at boot
 
 ```
 systemctl enable igbot
 ```
 
-### Start service
+### Start the service
 
 ```
 systemctl start igbot
