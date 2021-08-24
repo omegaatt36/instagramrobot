@@ -9,7 +9,7 @@
   <!-- [CodeFactor grade] -->
   <a href="https://codefactor.io/repository/github/feelthecode/instagramrobot"><img src="https://www.codefactor.io/repository/github/feelthecode/instagramrobot/badge" alt="CodeFactor"></a>
   <!-- [Go report score] -->
-  <a href="https://goreportcard.com/report/github.com/feelthecode/instagramrobot"><img src="https://goreportcard.com/badge/github.com/feelthecode/instagramrobot" alt="Go report" /></a>
+  <a href="https://goreportcard.com/report/github.com/feelthecode/instagramrobot"><img src="https://goreportcard.com/badge/github.com/feelthecode/instagramrobot?" alt="Go report" /></a>
   <!-- [GitHub license] -->
   <a href="https://github.com/feelthecode/instagramrobot/blob/main/LICENSE"><img src="https://img.shields.io/github/license/feelthecode/instagramrobot?color=blue" alt="License" /></a>
   <!-- [PRs welcome] -->
