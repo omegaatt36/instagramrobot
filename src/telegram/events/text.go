@@ -3,6 +3,7 @@ package events
 import (
 	"github.com/feelthecode/instagramrobot/src/helpers"
 	"github.com/feelthecode/instagramrobot/src/telegram/providers"
+	"github.com/feelthecode/instagramrobot/src/telegram/utils"
 	tb "gopkg.in/tucnak/telebot.v2"
 )
 
@@ -20,6 +21,11 @@ type textHandler struct {
 // Handler is the entry point for the incoming update
 func (l *textHandler) Handler(m *tb.Message) {
 	links := helpers.ExtractLinksFromString(m.Text)
+	// Send proper error if text has no link inside
+	if len(links) == 0 {
+		utils.ReplyError(l.bot, m, "Invalid command,\nPlease send the Instagram post link.")
+		return
+	}
 	l.processLinks(links, m)
 }
 
