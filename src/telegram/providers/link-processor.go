@@ -16,6 +16,7 @@ type linkProcessor struct {
 	msg *tb.Message
 }
 
+// NewLinkProcessor constructor
 func NewLinkProcessor(bot *tb.Bot, msg *tb.Message) linkProcessor {
 	return linkProcessor{
 		bot: bot,
@@ -23,7 +24,7 @@ func NewLinkProcessor(bot *tb.Bot, msg *tb.Message) linkProcessor {
 	}
 }
 
-// Process a single link
+// ProcessLink will process a single link
 func (l *linkProcessor) ProcessLink(link string) {
 	// Convert link to URL object
 	url, err := url.ParseRequestURI(link)

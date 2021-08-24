@@ -6,11 +6,13 @@ import (
 	tb "gopkg.in/tucnak/telebot.v2"
 )
 
+// Middleware struct
 type Middleware struct {
 	B *tb.Bot
 }
 
-func (m *Middleware) Get(update *tb.Update) bool {
+// GetFilter will return the middleware filter function
+func (m *Middleware) GetFilter(update *tb.Update) bool {
 	if !update.Message.Private() {
 		utils.ReplyError(m.B, update.Message, "I'm limited to private chats!")
 		if err := m.B.Leave(update.Message.Chat); err != nil {

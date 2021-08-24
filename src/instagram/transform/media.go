@@ -2,6 +2,7 @@ package transform
 
 import "github.com/feelthecode/instagramrobot/src/instagram/response"
 
+// Owner is a single Instagram user who owns the Media
 type Owner struct {
 	Id                string `json:"id"`
 	ProfilePictureURL string `json:"profile_pic_url"`
@@ -11,6 +12,8 @@ type Owner struct {
 	IsVerified        bool   `json:"is_verified"`
 }
 
+// MediaItem contains information about the Instagram post
+// which is similar to the Instagram Media struct
 type MediaItem struct {
 	Id        string `json:"id"`
 	Shortcode string `json:"shortcode"`
@@ -19,6 +22,7 @@ type MediaItem struct {
 	Url       string `json:"url"`
 }
 
+// Media which contains a single Instagram post
 type Media struct {
 	Id        string      `json:"id"`
 	Shortcode string      `json:"shortcode"`
@@ -32,6 +36,7 @@ type Media struct {
 	TakenAt   int64       `json:"taken_at"` // Timestamp
 }
 
+// FromEmbedResponse will automatically transforms the EmbedResponse to the Media
 func FromEmbedResponse(embed response.EmbedResponse) Media {
 	media := Media{
 		Id:        embed.Media.Id,

@@ -8,18 +8,19 @@ import (
 	"github.com/spf13/viper"
 )
 
-type ENV string
+type env string
 
 const (
-	production  ENV = "prod"
-	development ENV = "dev"
+	production  env = "prod"
+	development env = "dev"
 )
 
 type config struct {
-	APP_ENV   ENV    `mapstructure:"APP_ENV" validate:"required,oneof=prod dev"`
+	APP_ENV   env    `mapstructure:"APP_ENV" validate:"required,oneof=prod dev"`
 	BOT_TOKEN string `mapstructure:"BOT_TOKEN" validate:"required"`
 }
 
+// Load the configuration file
 func Load() {
 	viper.SetConfigName(".env")
 	viper.SetConfigType("env")
@@ -64,10 +65,12 @@ func Load() {
 	log.WithField("APP_ENV", viper.GetString("APP_ENV")).Info("Config loaded")
 }
 
+// IsDevelopment will return true if the APP_ENV is equals to dev
 func IsDevelopment() bool {
-	return ENV(viper.GetString("APP_ENV")) == development
+	return env(viper.GetString("APP_ENV")) == development
 }
 
+// IsProduction will return true if the APP_ENV is equals to prod
 func IsProduction() bool {
-	return ENV(viper.GetString("APP_ENV")) == production
+	return env(viper.GetString("APP_ENV")) == production
 }

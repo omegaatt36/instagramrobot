@@ -28,7 +28,7 @@ func (t *Bot) Register() error {
 
 	b, err := tb.NewBot(tb.Settings{
 		Token:   viper.GetString("BOT_TOKEN"),
-		Poller:  tb.NewMiddlewarePoller(poller, m.Get),
+		Poller:  tb.NewMiddlewarePoller(poller, m.GetFilter),
 		Verbose: config.IsDevelopment(),
 	})
 	if err != nil {
@@ -51,7 +51,7 @@ func (t *Bot) Register() error {
 
 func (t *Bot) registerCommands() {
 	// Commands
-	start := commands.StartCommand{B: t.b}
+	start := commands.Start{B: t.b}
 	t.b.Handle("/start", start.Handler)
 
 	// Events

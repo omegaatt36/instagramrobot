@@ -8,13 +8,14 @@ type Dimensions struct {
 	Width  int `json:"width"`  // Width of the media in pixels
 }
 
-// Media resource
+// Resource for an specific Media
 type Resource struct {
 	Width  int    `json:"config_width"`  // Height of the resource media in pixels
 	Height int    `json:"config_height"` // Height of the resource media in pixels
 	Src    string `json:"src"`           // Direct URL to the Resource
 }
 
+// Caption contains the raw caption of the Instagram post
 type Caption struct {
 	// List of Edge which contains multiple nodes
 	Edges []struct {
@@ -30,7 +31,7 @@ type WithCount struct {
 	Count uint64 `json:"count"` // The number of count
 }
 
-// The latest timeline feed of the User
+// OwnerTimeline contains the latest timeline feed of the Instagram user
 type OwnerTimeline struct {
 	Count uint64 `json:"count"` // Count of public posts
 	// List of Edge which contains multiple nodes
@@ -44,7 +45,7 @@ type OwnerTimeline struct {
 	} `json:"edges"`
 }
 
-// A single User who owns the Media
+// Owner is a single Instagram user who owns the Media
 type Owner struct {
 	Id                string        `json:"id"`                           // Unique ID of the User
 	ProfilePictureURL string        `json:"profile_pic_url"`              // URL of user's profile picture
@@ -56,6 +57,7 @@ type Owner struct {
 	Timeline          OwnerTimeline `json:"edge_owner_to_timeline_media"` // Timeline feeds of the User
 }
 
+// SliderItemNode contains information about the Instagram post
 type SliderItemNode struct {
 	Id               string     `json:"id"`                // Unique ID of the Media
 	Shortcode        string     `json:"shortcode"`         // Unique shortcode of the Media
@@ -83,7 +85,7 @@ func (s SliderItemNode) ExtractMediaURL() string {
 	return s.DisplayURL
 }
 
-// List of slider items
+// SliderItems contains list of the Instagram posts
 type SliderItems struct {
 	// List of Edge which contains multiple nodes
 	Edges []struct {
@@ -92,7 +94,7 @@ type SliderItems struct {
 	} `json:"edges"`
 }
 
-// A single Media
+// Media which contains a single Instagram post
 type Media struct {
 	Id               string     `json:"id"`                    // Unique ID of the Media
 	Shortcode        string     `json:"shortcode"`             // Unique shortcode of the Media
@@ -127,22 +129,22 @@ type Media struct {
 	// coauthor_producers
 }
 
-// Embed response
+// EmbedResponse base
 type EmbedResponse struct {
 	Media Media `json:"shortcode_media"` // Media
 }
 
-// Is the Media empty?
+// IsEmpty will return true if the Media object is empty
 func (s EmbedResponse) IsEmpty() bool {
 	return s.Media.Id == ""
 }
 
-// Is the Media type video?
+// IsVideo will return true if the Media type is equals to video
 func (s EmbedResponse) IsVideo() bool {
 	return s.Media.IsVideo
 }
 
-// Get the caption
+// GetCaption of the Media
 func (s EmbedResponse) GetCaption() string {
 	return s.Media.Caption.Edges[0].Node.Text
 }

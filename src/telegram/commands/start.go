@@ -5,12 +5,13 @@ import (
 	tb "gopkg.in/tucnak/telebot.v2"
 )
 
-type StartCommand struct {
+// Start command
+type Start struct {
 	B *tb.Bot // Bot instance
 }
 
 // The entry point for the incoming update
-func (s *StartCommand) Handler(m *tb.Message) {
+func (s *Start) Handler(m *tb.Message) {
 	// Ignore channels and groups
 	_, err := s.B.Reply(m, "Hello!")
 	if err != nil {

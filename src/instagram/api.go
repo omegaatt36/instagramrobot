@@ -14,11 +14,13 @@ import (
 	"github.com/feelthecode/instagramrobot/src/instagram/transform"
 )
 
+// API gives lets you to work with the Instagram API
 type API struct {
 	embedResponse response.EmbedResponse
 }
 
-// TODO change response type
+// GetPostWithCode lets you to get information about specific Instagram post
+// by providing its unique shortcode
 func (a *API) GetPostWithCode(code string) (transform.Media, error) {
 	// TODO: validate code
 

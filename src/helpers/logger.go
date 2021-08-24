@@ -8,6 +8,7 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
+// RegisterLogger will set the global and default settings for the logrus package
 func RegisterLogger() {
 	log.SetReportCaller(true)
 	log.SetOutput(os.Stdout)

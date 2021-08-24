@@ -2,7 +2,7 @@ package helpers
 
 import "net/url"
 
-// Check if a String is a URL
+// IsValidUrl checks if the String is a valid URL
 // https://golangcode.com/how-to-check-if-a-string-is-a-url/
 func IsValidUrl(toTest string) bool {
 	_, err := url.ParseRequestURI(toTest)

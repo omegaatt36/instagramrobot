@@ -6,19 +6,18 @@ import (
 	tb "gopkg.in/tucnak/telebot.v2"
 )
 
-// Text handler
-type textHandler struct {
-	bot *tb.Bot // Bot instance
-}
-
-// Text handler constructor
+// TextHandler constructor
 func TextHandler(bot *tb.Bot) textHandler {
 	return textHandler{
 		bot: bot,
 	}
 }
 
-// The entry point for the incoming update
+type textHandler struct {
+	bot *tb.Bot // Bot instance
+}
+
+// Handler is the entry point for the incoming update
 func (l *textHandler) Handler(m *tb.Message) {
 	links := helpers.ExtractLinksFromString(m.Text)
 	l.processLinks(links, m)

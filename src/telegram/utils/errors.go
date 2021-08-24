@@ -7,6 +7,8 @@ import (
 	tb "gopkg.in/tucnak/telebot.v2"
 )
 
+// ReplyError will sends the error to specific Telegram chat
+// with a pre-defined structure
 func ReplyError(b *tb.Bot, to *tb.Message, text string) {
 	_, err := b.Reply(to, fmt.Sprintf("⚠️ *Oops, ERROR!*\n\n`%v`", text), tb.ModeMarkdown)
 	if err != nil {
