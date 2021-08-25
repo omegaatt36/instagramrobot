@@ -55,6 +55,7 @@ func FromEmbedResponse(embed response.EmbedResponse) Media {
 			Id:        item.Node.Id,
 			Shortcode: item.Node.Shortcode,
 			Type:      item.Node.Type,
+			IsVideo:   item.Node.IsVideo,
 			Url:       item.Node.ExtractMediaURL(),
 		})
 	}

@@ -4,6 +4,7 @@ import (
 	"github.com/feelthecode/instagramrobot/src/config"
 	"github.com/feelthecode/instagramrobot/src/helpers"
 	"github.com/feelthecode/instagramrobot/src/telegram"
+	"github.com/feelthecode/instagramrobot/src/telegram/cache"
 
 	log "github.com/sirupsen/logrus"
 )
@@ -17,6 +18,9 @@ func main() {
 	} else {
 		log.SetLevel(log.InfoLevel)
 	}
+
+	// Register Telegram cache
+	cache.Register()
 
 	if err := telegram.Register(); err != nil {
 		log.Fatalf("Couldn't register the Telegram bot: %v", err)
