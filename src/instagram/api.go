@@ -7,11 +7,9 @@ import (
 	"net"
 	"net/http"
 	"regexp"
-	"strings"
 	"time"
 
 	browser "github.com/EDDYCJY/fake-useragent"
-	goQuery "github.com/PuerkitoBio/goquery"
 	"github.com/feelthecode/instagramrobot/src/instagram/response"
 	"github.com/feelthecode/instagramrobot/src/instagram/transform"
 	"github.com/gocolly/colly/v2"
@@ -29,59 +27,40 @@ var (
 	}
 )
 
-func getPicByColly(url string) (string, error) {
-	var embeddedMediaImage string
-	collector := colly.NewCollector()
-
-	collector.OnHTML("img.EmbeddedMediaImage", func(e *colly.HTMLElement) {
-		embeddedMediaImage = e.Attr("src")
-	})
-
-	collector.OnRequest(func(r *colly.Request) {
-		r.Headers.Set("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/86.0.4240.75 Safari/537.36")
-	})
-
-	if err := collector.Visit(url); err != nil {
-		return "", err
-	}
-
-	return embeddedMediaImage, nil
-}
-
 // GetPostWithCode lets you to get information about specific Instagram post
 // by providing its unique shortcode
 func GetPostWithCode(code string) (transform.Media, error) {
 	// TODO: validate code
 
 	URL := fmt.Sprintf("https://www.instagram.com/p/%v/embed/captioned/", code)
-	req, err := http.NewRequest("GET", URL, nil)
-	if err != nil {
-		return transform.Media{}, fmt.Errorf("failed to initial HTTP request to the Instagram: %v", err)
-	}
-	// Set random chrome user-agent
-	req.Header.Set("User-Agent", browser.Chrome())
 
-	res, err := client.Do(req)
-	if err != nil {
+	var embeddedMediaImage string
+	var embedResponse = response.EmbedResponse{}
+	collector := colly.NewCollector()
+	collector.SetClient(client)
+
+	collector.OnHTML("img.EmbeddedMediaImage", func(e *colly.HTMLElement) {
+		embeddedMediaImage = e.Attr("src")
+	})
+
+	collector.OnHTML("script", func(e *colly.HTMLElement) {
+		r := regexp.MustCompile(`window\.__additionalDataLoaded\(\'extra\',([\s\S]*)\);`)
+		match := r.FindStringSubmatch(e.Text)
+
+		if len(match) < 2 {
+			return
+		}
+
+		_ = json.Unmarshal([]byte(match[1]), &embedResponse)
+	})
+
+	collector.OnRequest(func(r *colly.Request) {
+		r.Headers.Set("User-Agent", browser.Chrome())
+	})
+
+	if err := collector.Visit(URL); err != nil {
 		return transform.Media{}, fmt.Errorf("failed to send HTTP request to the Instagram: %v", err)
 	}
-	defer res.Body.Close()
-	if res.StatusCode != 200 {
-		return transform.Media{}, fmt.Errorf("request failed with %v HTTP error", res.Status)
-	}
-
-	// Load the HTML document
-	doc, err := goQuery.NewDocumentFromReader(res.Body)
-	if err != nil {
-		return transform.Media{}, fmt.Errorf("couldn't initial document parser: %v", err)
-	}
-
-	embedResponse := response.EmbedResponse{}
-
-	// For each script item found
-	doc.Find("script").Each(func(i int, s *goQuery.Selection) {
-		checkScriptForJSON(&embedResponse, s.Text())
-	})
 
 	// If the method one which is JSON parsing didn't fail
 	if !embedResponse.IsEmpty() {
@@ -89,19 +68,15 @@ func GetPostWithCode(code string) (transform.Media, error) {
 		return transform.FromEmbedResponse(embedResponse), nil
 	}
 
-	embeddedMediaImage, err := getPicByColly(URL)
-	if err != nil {
-		return transform.Media{}, err
+	if embeddedMediaImage != "" {
+		return transform.Media{
+			Url: embeddedMediaImage,
+		}, nil
 	}
 
-	if embeddedMediaImage == "" {
-		// If every two methods have failed, then return an error
-		return transform.Media{}, errors.New("failed to fetch the post\nthe page might be \"private\", or\nthe link is completely wrong")
-	}
+	// If every two methods have failed, then return an error
+	return transform.Media{}, errors.New("failed to fetch the post\nthe page might be \"private\", or\nthe link is completely wrong")
 
-	return transform.Media{
-		Url: embeddedMediaImage,
-	}, nil
 }
 
 // ExtractShortcodeFromLink will extract the media shortcode from a URL link or path
@@ -112,15 +87,4 @@ func ExtractShortcodeFromLink(link string) (string, error) {
 	}
 	// return shortcode
 	return values[2], nil
-}
-
-func checkScriptForJSON(embedResponse *response.EmbedResponse, scriptContent string) {
-	validateText := "window.__additionalDataLoaded('extra',"
-	if !strings.Contains(scriptContent, validateText) {
-		return
-	}
-	res := strings.Replace(scriptContent, validateText, "", 1)
-	res = strings.Replace(res, ");", "", 1)
-
-	_ = json.Unmarshal([]byte(res), &embedResponse)
 }
