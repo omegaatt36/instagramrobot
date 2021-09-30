@@ -6,6 +6,7 @@ require (
 	github.com/EDDYCJY/fake-useragent v0.2.0
 	github.com/PuerkitoBio/goquery v1.7.1
 	github.com/go-playground/validator/v10 v10.9.0
+	github.com/gocolly/colly/v2 v2.1.0
 	github.com/patrickmn/go-cache v2.1.0+incompatible
 	github.com/pkg/errors v0.9.1 // indirect
 	github.com/sirupsen/logrus v1.8.1

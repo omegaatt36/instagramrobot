@@ -14,6 +14,7 @@ import (
 	goQuery "github.com/PuerkitoBio/goquery"
 	"github.com/feelthecode/instagramrobot/src/instagram/response"
 	"github.com/feelthecode/instagramrobot/src/instagram/transform"
+	"github.com/gocolly/colly/v2"
 )
 
 var (
@@ -27,6 +28,25 @@ var (
 		},
 	}
 )
+
+func getPicByColly(url string) (string, error) {
+	var embeddedMediaImage string
+	collector := colly.NewCollector()
+
+	collector.OnHTML("img.EmbeddedMediaImage", func(e *colly.HTMLElement) {
+		embeddedMediaImage = e.Attr("src")
+	})
+
+	collector.OnRequest(func(r *colly.Request) {
+		r.Headers.Set("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/86.0.4240.75 Safari/537.36")
+	})
+
+	if err := collector.Visit(url); err != nil {
+		return "", err
+	}
+
+	return embeddedMediaImage, nil
+}
 
 // GetPostWithCode lets you to get information about specific Instagram post
 // by providing its unique shortcode
@@ -69,10 +89,19 @@ func GetPostWithCode(code string) (transform.Media, error) {
 		return transform.FromEmbedResponse(embedResponse), nil
 	}
 
-	// TODO: Try second method by HTML body parsing
+	embeddedMediaImage, err := getPicByColly(URL)
+	if err != nil {
+		return transform.Media{}, err
+	}
 
-	// If every two methods have failed, then return an error
-	return transform.Media{}, errors.New("failed to fetch the post\nthe page might be \"private\", or\nthe link is completely wrong")
+	if embeddedMediaImage == "" {
+		// If every two methods have failed, then return an error
+		return transform.Media{}, errors.New("failed to fetch the post\nthe page might be \"private\", or\nthe link is completely wrong")
+	}
+
+	return transform.Media{
+		Url: embeddedMediaImage,
+	}, nil
 }
 
 // ExtractShortcodeFromLink will extract the media shortcode from a URL link or path
