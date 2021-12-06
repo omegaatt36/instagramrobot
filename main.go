@@ -2,6 +2,7 @@ package main
 
 import (
 	"github.com/feelthecode/instagramrobot/src/config"
+	"github.com/feelthecode/instagramrobot/src/health"
 	"github.com/feelthecode/instagramrobot/src/helpers"
 	"github.com/feelthecode/instagramrobot/src/telegram"
 
@@ -9,6 +10,8 @@ import (
 )
 
 func main() {
+	go health.StartServer()
+
 	helpers.RegisterLogger()
 	config.Load()
 

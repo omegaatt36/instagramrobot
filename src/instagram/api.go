@@ -9,9 +9,10 @@ import (
 	"regexp"
 	"time"
 
-	browser "github.com/EDDYCJY/fake-useragent"
 	"github.com/feelthecode/instagramrobot/src/instagram/response"
 	"github.com/feelthecode/instagramrobot/src/instagram/transform"
+
+	browser "github.com/EDDYCJY/fake-useragent"
 	"github.com/gocolly/colly/v2"
 )
 

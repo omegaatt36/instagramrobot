@@ -7,6 +7,7 @@ import (
 	"github.com/feelthecode/instagramrobot/src/telegram/commands"
 	"github.com/feelthecode/instagramrobot/src/telegram/events"
 	"github.com/feelthecode/instagramrobot/src/telegram/middleware"
+
 	log "github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
 	tb "gopkg.in/tucnak/telebot.v2"

@@ -2,6 +2,7 @@ package middleware
 
 import (
 	"github.com/feelthecode/instagramrobot/src/telegram/utils"
+
 	log "github.com/sirupsen/logrus"
 	tb "gopkg.in/tucnak/telebot.v2"
 )
