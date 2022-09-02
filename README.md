@@ -3,29 +3,29 @@
 <!-- [START badges] -->
 <p>
   <!-- [GitHub Build Workflow] -->
-  <a href="https://github.com/feelthecode/instagramrobot/actions/workflows/build.yml"><img src="https://github.com/feelthecode/instagramrobot/actions/workflows/build.yml/badge.svg" alt="Build status"></a>
+  <a href="https://github.com/omegaatt36/instagramrobot/actions/workflows/build.yml"><img src="https://github.com/omegaatt36/instagramrobot/actions/workflows/build.yml/badge.svg" alt="Build status"></a>
   <!-- [GitHub Lint Workflow] -->
-  <a href="https://github.com/feelthecode/instagramrobot/actions/workflows/lint.yml"><img src="https://github.com/feelthecode/instagramrobot/actions/workflows/lint.yml/badge.svg" alt="Build status"></a>
+  <a href="https://github.com/omegaatt36/instagramrobot/actions/workflows/lint.yml"><img src="https://github.com/omegaatt36/instagramrobot/actions/workflows/lint.yml/badge.svg" alt="Build status"></a>
   <!-- [CodeFactor grade] -->
-  <a href="https://codefactor.io/repository/github/feelthecode/instagramrobot"><img src="https://www.codefactor.io/repository/github/feelthecode/instagramrobot/badge" alt="CodeFactor"></a>
+  <a href="https://codefactor.io/repository/github/omegaatt36/instagramrobot"><img src="https://www.codefactor.io/repository/github/omegaatt36/instagramrobot/badge" alt="CodeFactor"></a>
   <!-- [Go report score] -->
-  <a href="https://goreportcard.com/report/github.com/feelthecode/instagramrobot"><img src="https://goreportcard.com/badge/github.com/feelthecode/instagramrobot?" alt="Go report" /></a>
+  <a href="https://goreportcard.com/report/github.com/omegaatt36/instagramrobot"><img src="https://goreportcard.com/badge/github.com/omegaatt36/instagramrobot?" alt="Go report" /></a>
   <!-- [GitHub license] -->
-  <a href="https://github.com/feelthecode/instagramrobot/blob/main/LICENSE"><img src="https://img.shields.io/github/license/feelthecode/instagramrobot?color=blue" alt="License" /></a>
+  <a href="https://github.com/omegaatt36/instagramrobot/blob/main/LICENSE"><img src="https://img.shields.io/github/license/omegaatt36/instagramrobot?color=blue" alt="License" /></a>
   <!-- [PRs welcome] -->
-  <a href="https://github.com/feelthecode/instagramrobot/pulls"><img src="https://img.shields.io/badge/PRs-welcome-blue.svg?color=d9ecde" alt="Contributing"></a>
+  <a href="https://github.com/omegaatt36/instagramrobot/pulls"><img src="https://img.shields.io/badge/PRs-welcome-blue.svg?color=d9ecde" alt="Contributing"></a>
 </p>
 <!-- [END badges] -->
 
 <!-- [START description] -->
 
-<a href="https://github.com/feelthecode/instagramrobot" >
-  <img align="right" src="https://raw.githubusercontent.com/feelthecode/instagramrobot/main/images/ig-logo.svg" width="80" />
-  <img align="right" src="https://raw.githubusercontent.com/feelthecode/instagramrobot/main/images/telegram-logo.svg" width="80" />
-  <img align="right" src="https://raw.githubusercontent.com/feelthecode/instagramrobot/main/images/golang-logo.svg" height="80" />
+<a href="https://github.com/omegaatt36/instagramrobot" >
+  <img align="right" src="https://raw.githubusercontent.com/omegaatt36/instagramrobot/main/images/ig-logo.svg" width="80" />
+  <img align="right" src="https://raw.githubusercontent.com/omegaatt36/instagramrobot/main/images/telegram-logo.svg" width="80" />
+  <img align="right" src="https://raw.githubusercontent.com/omegaatt36/instagramrobot/main/images/golang-logo.svg" height="80" />
 </a>
 
-> [InstagramRobot](https://github.com/feelthecode/instagramrobot) is a bot based on [Telegram Bot API](https://core.telegram.org/bots/api) written in [Golang](https://golang.org/) that allows users to download public [Instagram](https://www.instagram.com/) photos, videos, and albums, without getting the user's credentials.
+> [InstagramRobot](https://github.com/omegaatt36/instagramrobot) is a bot based on [Telegram Bot API](https://core.telegram.org/bots/api) written in [Golang](https://golang.org/) that allows users to download public [Instagram](https://www.instagram.com/) photos, videos, and albums, without getting the user's credentials.
 
 <!-- [END description] -->
 
@@ -42,14 +42,19 @@
     -   [Enable the service at boot](#enable-the-service-at-boot)
     -   [Start the service](#start-the-service)
 
+
 ## Installing
 
-You can download the latest version by checking the [GitHub releases](https://github.com/feelthecode/instagramrobot/releases) page.
+<!--
+
+You can download the latest version by checking the [GitHub releases](https://github.com/omegaatt36/instagramrobot/releases) page.
+
+-->
 
 Alternatively, you can download this project by cloning its Git repository:
 
 ```
-git clone https://github.com/feelthecode/instagramrobot.git
+git clone https://github.com/omegaatt36/instagramrobot.git
 ```
 
 ## Configuration
