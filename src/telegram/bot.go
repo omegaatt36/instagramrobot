@@ -3,10 +3,10 @@ package telegram
 import (
 	"time"
 
-	"github.com/feelthecode/instagramrobot/src/config"
-	"github.com/feelthecode/instagramrobot/src/telegram/commands"
-	"github.com/feelthecode/instagramrobot/src/telegram/events"
-	"github.com/feelthecode/instagramrobot/src/telegram/middleware"
+	"github.com/omegaatt36/instagramrobot/src/config"
+	"github.com/omegaatt36/instagramrobot/src/telegram/commands"
+	"github.com/omegaatt36/instagramrobot/src/telegram/events"
+	"github.com/omegaatt36/instagramrobot/src/telegram/middleware"
 
 	log "github.com/sirupsen/logrus"
 	"github.com/spf13/viper"

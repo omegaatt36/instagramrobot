@@ -1,10 +1,10 @@
 package main
 
 import (
-	"github.com/feelthecode/instagramrobot/src/config"
-	"github.com/feelthecode/instagramrobot/src/health"
-	"github.com/feelthecode/instagramrobot/src/helpers"
-	"github.com/feelthecode/instagramrobot/src/telegram"
+	"github.com/omegaatt36/instagramrobot/src/config"
+	"github.com/omegaatt36/instagramrobot/src/health"
+	"github.com/omegaatt36/instagramrobot/src/helpers"
+	"github.com/omegaatt36/instagramrobot/src/telegram"
 
 	log "github.com/sirupsen/logrus"
 )

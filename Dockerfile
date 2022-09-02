@@ -1,4 +1,4 @@
-FROM golang:1.16-alpine as build
+FROM golang:1.19-alpine as build
 
 # Set the working directory
 WORKDIR /go/src/app

@@ -1,7 +1,7 @@
 package providers
 
 import (
-	"github.com/feelthecode/instagramrobot/src/instagram/transform"
+	"github.com/omegaatt36/instagramrobot/src/instagram/transform"
 
 	log "github.com/sirupsen/logrus"
 	tb "gopkg.in/tucnak/telebot.v2"

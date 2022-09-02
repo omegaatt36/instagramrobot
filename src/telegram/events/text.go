@@ -1,9 +1,9 @@
 package events
 
 import (
-	"github.com/feelthecode/instagramrobot/src/helpers"
-	"github.com/feelthecode/instagramrobot/src/telegram/providers"
-	"github.com/feelthecode/instagramrobot/src/telegram/utils"
+	"github.com/omegaatt36/instagramrobot/src/helpers"
+	"github.com/omegaatt36/instagramrobot/src/telegram/providers"
+	"github.com/omegaatt36/instagramrobot/src/telegram/utils"
 
 	tb "gopkg.in/tucnak/telebot.v2"
 )

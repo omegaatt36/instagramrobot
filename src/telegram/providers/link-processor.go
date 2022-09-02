@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"net/url"
 
-	"github.com/feelthecode/instagramrobot/src/instagram"
-	"github.com/feelthecode/instagramrobot/src/telegram/utils"
+	"github.com/omegaatt36/instagramrobot/src/instagram"
+	"github.com/omegaatt36/instagramrobot/src/telegram/utils"
 
 	log "github.com/sirupsen/logrus"
 	tb "gopkg.in/tucnak/telebot.v2"

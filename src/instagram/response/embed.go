@@ -1,6 +1,6 @@
 package response
 
-import "github.com/feelthecode/instagramrobot/src/types"
+import "github.com/omegaatt36/instagramrobot/src/types"
 
 // Dimensions of the media
 type Dimensions struct {
