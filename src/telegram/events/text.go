@@ -4,35 +4,49 @@ import (
 	"github.com/omegaatt36/instagramrobot/src/helpers"
 	"github.com/omegaatt36/instagramrobot/src/telegram/providers"
 	"github.com/omegaatt36/instagramrobot/src/telegram/utils"
-
-	tb "gopkg.in/tucnak/telebot.v2"
+	log "github.com/sirupsen/logrus"
+	"gopkg.in/telebot.v3"
 )
 
 // TextHandler constructor
-func TextHandler(bot *tb.Bot) textHandler {
+func TextHandler(bot *telebot.Bot) textHandler {
 	return textHandler{
 		bot: bot,
 	}
 }
 
 type textHandler struct {
-	bot *tb.Bot // Bot instance
+	bot *telebot.Bot // Bot instance
 }
 
 // Handler is the entry point for the incoming update
-func (l *textHandler) Handler(m *tb.Message) {
-	links := helpers.ExtractLinksFromString(m.Text)
+func (l *textHandler) Handler(c telebot.Context) error {
+	links := helpers.ExtractLinksFromString(c.Message().Text)
 	// Send proper error if text has no link inside
 	if len(links) == 0 {
-		utils.ReplyError(l.bot, m, "Invalid command,\nPlease send the Instagram post link.")
-		return
+		if c.Chat().Type != telebot.ChatPrivate {
+			return nil
+		}
+
+		log.Error("Invalid command,\nPlease send the Instagram post link.")
+		return utils.ReplyError(c, "Invalid command,\nPlease send the Instagram post link.")
 	}
-	l.processLinks(links, m)
+
+	if err := l.processLinks(links, c.Message()); err != nil {
+		if c.Chat().Type != telebot.ChatPrivate {
+			return nil
+		}
+
+		log.Error(err)
+		return utils.ReplyError(c, err.Error())
+	}
+
+	return nil
 }
 
 // Gets list of links from user message text
 // and processes each one of them one by one.
-func (l *textHandler) processLinks(links []string, m *tb.Message) {
+func (l *textHandler) processLinks(links []string, m *telebot.Message) error {
 	for index, link := range links {
 		linkProcessor := providers.NewLinkProcessor(l.bot, m)
 
@@ -40,6 +54,9 @@ func (l *textHandler) processLinks(links []string, m *tb.Message) {
 			break
 		}
 
-		linkProcessor.ProcessLink(link)
+		if err := linkProcessor.ProcessLink(link); err != nil {
+			return err
+		}
 	}
+	return nil
 }

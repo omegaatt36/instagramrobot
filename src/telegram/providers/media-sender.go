@@ -2,14 +2,15 @@ package providers
 
 import (
 	"github.com/omegaatt36/instagramrobot/src/instagram/transform"
+	"github.com/pkg/errors"
+	"gopkg.in/telebot.v3"
 
 	log "github.com/sirupsen/logrus"
-	tb "gopkg.in/tucnak/telebot.v2"
 )
 
 type MediaSender struct {
-	bot   *tb.Bot
-	msg   *tb.Message
+	bot   *telebot.Bot
+	msg   *telebot.Message
 	media transform.Media
 }
 
@@ -18,59 +19,61 @@ const (
 )
 
 // Send will start to process Media and eventually send it to the Telegram chat
-func (m *MediaSender) Send() {
+func (m *MediaSender) Send() error {
+	var err error
 	// Check if media has no child item
 	if len(m.media.Items) == 0 {
-		m.sendSingleMedia()
+		err = m.sendSingleMedia()
 	} else {
-		m.sendNestedMedia()
+		err = m.sendNestedMedia()
 	}
+
+	return err
 }
 
-func (m *MediaSender) sendSingleMedia() {
+func (m *MediaSender) sendSingleMedia() error {
 	if m.media.IsVideo {
-		if _, err := m.bot.Send(m.msg.Chat, &tb.Video{
-			File:    tb.FromURL(m.media.Url),
+		if _, err := m.bot.Send(m.msg.Chat, &telebot.Video{
+			File:    telebot.FromURL(m.media.Url),
 			Caption: caption,
 		}); err != nil {
-			log.Errorf("couldn't send the single video: %v", err)
-			return
+			return errors.Wrap(err, "couldn't send the single video")
 		}
-		log.Debugf("Sent single video with shortcode [%v]", m.media.Shortcode)
 
+		log.Debugf("Sent single video with short code [%v]", m.media.Shortcode)
 	} else {
-		if _, err := m.bot.Send(m.msg.Chat, &tb.Photo{
-			File:    tb.FromURL(m.media.Url),
+		if _, err := m.bot.Send(m.msg.Chat, &telebot.Photo{
+			File:    telebot.FromURL(m.media.Url),
 			Caption: caption,
 		}); err != nil {
-			log.Errorf("couldn't send the single photo: %v", err)
-			return
+			return errors.Wrap(err, "couldn't send the single photo")
 		}
-		log.Debugf("Sent single photo with shortcode [%v]", m.media.Shortcode)
+
+		log.Debugf("Sent single photo with short code [%v]", m.media.Shortcode)
 	}
 
-	m.sendCaption(m.media.Caption)
+	return m.sendCaption(m.media.Caption)
 }
 
-func (m *MediaSender) sendNestedMedia() {
+func (m *MediaSender) sendNestedMedia() error {
 	_, err := m.bot.SendAlbum(m.msg.Chat, m.generateAlbumFromMedia())
 	if err != nil {
-		log.Errorf("couldn't send the single video: %v", err)
+		return errors.Wrap(err, "couldn't send the single video")
 	}
-	m.sendCaption(m.media.Caption)
+	return m.sendCaption(m.media.Caption)
 }
 
-func (m *MediaSender) generateAlbumFromMedia() tb.Album {
-	var album tb.Album
+func (m *MediaSender) generateAlbumFromMedia() telebot.Album {
+	var album telebot.Album
 
 	for _, media := range m.media.Items {
 		if media.IsVideo {
-			album = append(album, &tb.Video{
-				File: tb.FromURL(media.Url),
+			album = append(album, &telebot.Video{
+				File: telebot.FromURL(media.Url),
 			})
 		} else {
-			album = append(album, &tb.Photo{
-				File: tb.FromURL(media.Url),
+			album = append(album, &telebot.Photo{
+				File: telebot.FromURL(media.Url),
 			})
 		}
 	}
@@ -78,11 +81,12 @@ func (m *MediaSender) generateAlbumFromMedia() tb.Album {
 	return album
 }
 
-func (m *MediaSender) sendCaption(caption string) {
+func (m *MediaSender) sendCaption(caption string) error {
 	// If caption is empty, ignore sending it
 	if m.media.Caption == "" {
-		return
+		return nil
 	}
 	// TODO: chunk caption if the length is above the Telegram limit
-	_, _ = m.bot.Reply(m.msg, caption)
+	_, err := m.bot.Reply(m.msg, caption)
+	return err
 }

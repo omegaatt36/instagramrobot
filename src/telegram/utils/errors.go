@@ -3,17 +3,23 @@ package utils
 import (
 	"fmt"
 
-	log "github.com/sirupsen/logrus"
-	tb "gopkg.in/tucnak/telebot.v2"
+	"github.com/pkg/errors"
+	"gopkg.in/telebot.v3"
+)
+
+// Errors
+var (
+	ErrInvalidHost = errors.New("invalid host")
 )
 
 // ReplyError will sends the error to specific Telegram chat
 // with a pre-defined structure
-func ReplyError(b *tb.Bot, to *tb.Message, text string) {
-	_, err := b.Reply(to, fmt.Sprintf("⚠️ *Oops, ERROR!*\n\n`%v`", text), tb.ModeMarkdown)
+func ReplyError(c telebot.Context, text string) error {
+	_, err := c.Bot().Reply(c.Message(), fmt.Sprintf("⚠️ *Oops, ERROR!*\n\n`%v`", text), telebot.ModeMarkdown)
 	if err != nil {
-		log.WithFields(log.Fields{
-			"chat_id": to.Chat.ID,
-		}).Errorf("Couldn't reply the Error: %v", err)
+		return errors.Wrapf(err, "Couldn't reply the Error, chat_id: %d", c.Chat().ID)
 	}
+
+	return nil
+
 }

@@ -6,31 +6,20 @@ import (
 	"github.com/omegaatt36/instagramrobot/src/config"
 	"github.com/omegaatt36/instagramrobot/src/telegram/commands"
 	"github.com/omegaatt36/instagramrobot/src/telegram/events"
-	"github.com/omegaatt36/instagramrobot/src/telegram/middleware"
+	"gopkg.in/telebot.v3"
 
 	log "github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
-	tb "gopkg.in/tucnak/telebot.v2"
 )
 
-var b *tb.Bot
+var b *telebot.Bot
 
 // Register will generate a fresh Telegram bot instance
 // and registers it's handler logics
 func Register() error {
-	poller := &tb.LongPoller{
-		Timeout:        15 * time.Second,
-		AllowedUpdates: []string{"message"},
-	}
-
-	// Generate middleware
-	m := middleware.Middleware{
-		B: b,
-	}
-
-	bot, err := tb.NewBot(tb.Settings{
+	bot, err := telebot.NewBot(telebot.Settings{
 		Token:   viper.GetString("BOT_TOKEN"),
-		Poller:  tb.NewMiddlewarePoller(poller, m.GetFilter),
+		Poller:  &telebot.LongPoller{Timeout: 10 * time.Second},
 		Verbose: config.IsDevelopment(),
 	})
 	if err != nil {
@@ -58,7 +47,7 @@ func registerCommands() {
 
 	// Events
 	text := events.TextHandler(b)
-	b.Handle(tb.OnText, text.Handler)
+	b.Handle(telebot.OnText, text.Handler)
 }
 
 // Start brings bot into motion by consuming incoming updates
