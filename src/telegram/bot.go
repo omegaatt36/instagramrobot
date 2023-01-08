@@ -46,7 +46,7 @@ func registerCommands() {
 	b.Handle("/start", start.Handler)
 
 	// Events
-	text := events.TextHandler(b)
+	text := events.NewTextHandler(b)
 	b.Handle(telebot.OnText, text.Handler)
 }
 

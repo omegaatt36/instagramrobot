@@ -8,19 +8,19 @@ import (
 	"gopkg.in/telebot.v3"
 )
 
-// TextHandler constructor
-func TextHandler(bot *telebot.Bot) textHandler {
-	return textHandler{
+// NewTextHandler constructor
+func NewTextHandler(bot *telebot.Bot) TextHandler {
+	return TextHandler{
 		bot: bot,
 	}
 }
 
-type textHandler struct {
+type TextHandler struct {
 	bot *telebot.Bot // Bot instance
 }
 
 // Handler is the entry point for the incoming update
-func (l *textHandler) Handler(c telebot.Context) error {
+func (l *TextHandler) Handler(c telebot.Context) error {
 	links := helpers.ExtractLinksFromString(c.Message().Text)
 	// Send proper error if text has no link inside
 	if len(links) == 0 {
@@ -46,7 +46,7 @@ func (l *textHandler) Handler(c telebot.Context) error {
 
 // Gets list of links from user message text
 // and processes each one of them one by one.
-func (l *textHandler) processLinks(links []string, m *telebot.Message) error {
+func (l *TextHandler) processLinks(links []string, m *telebot.Message) error {
 	for index, link := range links {
 		linkProcessor := providers.NewLinkProcessor(l.bot, m)
 

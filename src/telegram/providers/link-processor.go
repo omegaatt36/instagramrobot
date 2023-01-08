@@ -10,21 +10,22 @@ import (
 	"gopkg.in/telebot.v3"
 )
 
-type linkProcessor struct {
+// LinkProcessor defines link processor.
+type LinkProcessor struct {
 	bot *telebot.Bot
 	msg *telebot.Message
 }
 
 // NewLinkProcessor constructor
-func NewLinkProcessor(bot *telebot.Bot, msg *telebot.Message) linkProcessor {
-	return linkProcessor{
+func NewLinkProcessor(bot *telebot.Bot, msg *telebot.Message) LinkProcessor {
+	return LinkProcessor{
 		bot: bot,
 		msg: msg,
 	}
 }
 
 // ProcessLink will process a single link
-func (l *linkProcessor) ProcessLink(link string) error {
+func (l *LinkProcessor) ProcessLink(link string) error {
 	// Convert link to URL object
 	url, err := url.ParseRequestURI(link)
 
@@ -65,7 +66,7 @@ func (l *linkProcessor) ProcessLink(link string) error {
 }
 
 // Protect user from sending bulk links in a single message.
-func (l *linkProcessor) CheckIndexForSpam(index int) bool {
+func (l *LinkProcessor) CheckIndexForSpam(index int) bool {
 	// TODO: load from Config
 	AllowedLinksPerMessage := 3
 	if index == AllowedLinksPerMessage {
