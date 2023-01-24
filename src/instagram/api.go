@@ -82,7 +82,7 @@ func GetPostWithCode(code string) (transform.Media, error) {
 
 // ExtractShortcodeFromLink will extract the media shortcode from a URL link or path
 func ExtractShortcodeFromLink(link string) (string, error) {
-	values := regexp.MustCompile(`(p|tv|reel)\/([A-Za-z0-9-_]+)`).FindStringSubmatch(link)
+	values := regexp.MustCompile(`(p|tv|reel|reels\/videos)\/([A-Za-z0-9-_]+)`).FindStringSubmatch(link)
 	if len(values) != 3 {
 		return "", errors.New("couldn't extract the media shortcode from the link")
 	}
