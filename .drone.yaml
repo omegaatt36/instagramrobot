@@ -1,0 +1,29 @@
+---
+kind: pipeline
+name: build-docker
+
+platform:
+  os: linux
+  arch: amd64
+
+trigger:
+  envent:
+  - push
+  branch:
+  - main
+
+
+steps:
+- name: default-publish
+  pull: always
+  image: plugins/docker:linux-amd64
+  settings:
+    auto_tag: true
+    cache_from: omegaatt36/insta-fetcher
+    daemon_off: false
+    dockerfile: Dockerfile
+    username:
+      from_secret: docker_username
+    password:
+      from_secret: docker_password
+    repo: omegaatt36/insta-fetcher
