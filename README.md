@@ -65,6 +65,14 @@ Create the `.env` file based on the `.env.example` file, and update its values.
 cp .env.example .env
 ```
 
+## Installing via Kubernetes by using helm
+
+```shell
+pushd charts
+helm upgrade --install -v values.yaml insta-fetcher .
+popd
+```
+
 ## Installing via Docker
 
 Docker is a tool designed to make it easier to create, deploy, and run applications by using containers.
