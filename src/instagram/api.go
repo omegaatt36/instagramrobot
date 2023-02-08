@@ -4,9 +4,11 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"log"
 	"net"
 	"net/http"
 	"regexp"
+	"strings"
 	"time"
 
 	"github.com/omegaatt36/instagramrobot/src/instagram/response"
@@ -45,14 +47,21 @@ func GetPostWithCode(code string) (transform.Media, error) {
 	})
 
 	collector.OnHTML("script", func(e *colly.HTMLElement) {
-		r := regexp.MustCompile(`window\.__additionalDataLoaded\(\'extra\',([\s\S]*)\);`)
+		r := regexp.MustCompile(`\\\"gql_data\\\":([\s\S]*\}\}\}\]\}\}\})\}`)
 		match := r.FindStringSubmatch(e.Text)
 
 		if len(match) < 2 {
 			return
 		}
 
-		_ = json.Unmarshal([]byte(match[1]), &embedResponse)
+		s := strings.ReplaceAll(match[1], `\"`, `"`)
+		s = strings.ReplaceAll(s, `\\/`, `/`)
+		s = strings.ReplaceAll(s, `\\`, `\`)
+
+		err := json.Unmarshal([]byte(s), &embedResponse)
+		if err != nil {
+			log.Fatal(err)
+		}
 	})
 
 	collector.OnRequest(func(r *colly.Request) {

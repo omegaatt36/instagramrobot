@@ -58,7 +58,7 @@ func (m *MediaSender) sendSingleMedia() error {
 func (m *MediaSender) sendNestedMedia() error {
 	_, err := m.bot.SendAlbum(m.msg.Chat, m.generateAlbumFromMedia())
 	if err != nil {
-		return errors.Wrap(err, "couldn't send the single video")
+		return errors.Wrap(err, "couldn't send the nested media")
 	}
 	return m.sendCaption(m.media.Caption)
 }
