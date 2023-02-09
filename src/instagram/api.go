@@ -47,7 +47,7 @@ func GetPostWithCode(code string) (transform.Media, error) {
 	})
 
 	collector.OnHTML("script", func(e *colly.HTMLElement) {
-		r := regexp.MustCompile(`\\\"gql_data\\\":([\s\S]*\}\}\}\]\}\}\})\}`)
+		r := regexp.MustCompile(`\\\"gql_data\\\":([\s\S]*)\}\"\}\]\]\,\[\"NavigationMetrics`)
 		match := r.FindStringSubmatch(e.Text)
 
 		if len(match) < 2 {
