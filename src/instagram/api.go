@@ -11,11 +11,10 @@ import (
 	"strings"
 	"time"
 
-	"github.com/omegaatt36/instagramrobot/src/instagram/response"
-	"github.com/omegaatt36/instagramrobot/src/instagram/transform"
-
 	browser "github.com/EDDYCJY/fake-useragent"
 	"github.com/gocolly/colly/v2"
+	"github.com/omegaatt36/instagramrobot/src/instagram/response"
+	"github.com/omegaatt36/instagramrobot/src/instagram/transform"
 )
 
 var (

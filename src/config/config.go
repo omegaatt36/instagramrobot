@@ -1,76 +1,62 @@
+//go:generate go-enum -f=$GOFILE
+
 package config
 
 import (
-	"flag"
-
-	"github.com/go-playground/validator/v10"
-	log "github.com/sirupsen/logrus"
-	"github.com/spf13/viper"
+	"github.com/omegaatt36/instagramrobot/app/cliflag"
+	"github.com/urfave/cli/v2"
 )
 
+// ENUM(
+// development
+// production
+// )
 type env string
 
-const (
-	production  env = "prod"
-	development env = "dev"
-)
-
 type config struct {
-	APP_ENV   env    `mapstructure:"APP_ENV" validate:"required,oneof=prod dev"`
-	BOT_TOKEN string `mapstructure:"BOT_TOKEN" validate:"required"`
+	appEnvironment string
+	botToken       string
 }
 
-// Load the configuration file
-func Load() {
-	viper.SetConfigName(".env")
-	viper.SetConfigType("env")
+var defaultConfig config
 
-	configPath := flag.String("config-path", "", "config file path")
-	flag.Parse()
-
-	if *configPath != "" {
-		// Register config folder from flag
-		viper.AddConfigPath(*configPath)
-	} else {
-		// Current directory
-		viper.AddConfigPath("$HOME/")
-		viper.AddConfigPath(".")
-	}
-
-	if err := viper.ReadInConfig(); err != nil {
-		// log.Warn(err)
-		log.Info("Config loaded from env vars")
-
-		// TODO: refactor with foreach
-		if err := viper.BindEnv("APP_ENV"); err != nil {
-			log.Fatal("Couldn't bind the APP_ENV env var")
-		}
-		if err := viper.BindEnv("BOT_TOKEN"); err != nil {
-			log.Fatal("Couldn't bind the BOT_TOKEN env var")
-		}
-	}
-
-	var c *config
-
-	if err := viper.Unmarshal(&c); err != nil {
-		log.Fatalf("Could not unmarshal config: %v", err)
-	}
-
-	// validate configuration keys and values
-	validate := validator.New()
-	if err := validate.Struct(c); err != nil {
-		log.Fatalf("Config validation failed:\n%v", err)
-	}
-
-	log.WithField("APP_ENV", viper.GetString("APP_ENV")).Info("Config loaded")
+func init() {
+	cliflag.Register(&defaultConfig)
 }
 
-// IsDevelopment will return true if the APP_ENV is equals to dev
+// CliFlags returns cli flags to setup cache package.
+func (cfg *config) CliFlags() []cli.Flag {
+	var flags []cli.Flag
+	flags = append(flags, &cli.StringFlag{
+		Name:        "app-env",
+		EnvVars:     []string{"APP_ENV"},
+		Destination: &cfg.appEnvironment,
+		Required:    true,
+		DefaultText: EnvDevelopment.String(),
+		Value:       EnvDevelopment.String(),
+	})
+
+	flags = append(flags, &cli.StringFlag{
+		Name:        "bot-token",
+		EnvVars:     []string{"BOT_TOKEN"},
+		Destination: &cfg.botToken,
+		Required:    true,
+	})
+
+	return flags
+}
+
+// IsDevelopment will return true if the APP_ENV is equals to dev.
 func IsDevelopment() bool {
-	return env(viper.GetString("APP_ENV")) == development
+	return defaultConfig.appEnvironment == EnvDevelopment.String()
 }
 
-// IsProduction will return true if the APP_ENV is equals to prod
+// IsProduction will return true if the APP_ENV is equals to prod.
 func IsProduction() bool {
-	return env(viper.GetString("APP_ENV")) == production
+	return defaultConfig.appEnvironment == EnvProduction.String()
+}
+
+// BotToken returns the bot token.
+func BotToken() string {
+	return defaultConfig.botToken
 }

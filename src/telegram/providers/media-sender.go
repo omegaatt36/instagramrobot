@@ -3,9 +3,8 @@ package providers
 import (
 	"github.com/omegaatt36/instagramrobot/src/instagram/transform"
 	"github.com/pkg/errors"
-	"gopkg.in/telebot.v3"
-
 	log "github.com/sirupsen/logrus"
+	"gopkg.in/telebot.v3"
 )
 
 type MediaSender struct {

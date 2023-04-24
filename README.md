@@ -33,6 +33,7 @@
 
 -   [Installing](#installing)
 -   [Configuration](#configuration)
+-   [Installing via Kubernetes by using helm](#installing-via-kubernetes-by-using-helm)
 -   [Installing via Docker](#installing-via-docker)
     -   [Building the container](#building-the-container)
     -   [Running the container](#running-the-container)
@@ -59,10 +60,8 @@ git clone https://github.com/omegaatt36/instagramrobot.git
 
 ## Configuration
 
-Create the `.env` file based on the `.env.example` file, and update its values.
-
 ```bash
-cp .env.example .env
+go run main.go --bot-token=***** --app-env=development
 ```
 
 ## Installing via Kubernetes by using helm

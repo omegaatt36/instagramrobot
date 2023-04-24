@@ -1,24 +1,23 @@
 package telegram
 
 import (
+	"context"
 	"time"
 
 	"github.com/omegaatt36/instagramrobot/src/config"
 	"github.com/omegaatt36/instagramrobot/src/telegram/commands"
 	"github.com/omegaatt36/instagramrobot/src/telegram/events"
-	"gopkg.in/telebot.v3"
-
 	log "github.com/sirupsen/logrus"
-	"github.com/spf13/viper"
+	"gopkg.in/telebot.v3"
 )
 
 var b *telebot.Bot
 
 // Register will generate a fresh Telegram bot instance
 // and registers it's handler logics
-func Register() error {
+func Register(botToken string) error {
 	bot, err := telebot.NewBot(telebot.Settings{
-		Token:   viper.GetString("BOT_TOKEN"),
+		Token:   botToken,
 		Poller:  &telebot.LongPoller{Timeout: 10 * time.Second},
 		Verbose: config.IsDevelopment(),
 	})
@@ -51,7 +50,12 @@ func registerCommands() {
 }
 
 // Start brings bot into motion by consuming incoming updates
-func Start() {
+func Start(ctx context.Context) {
 	log.Warn("Telegram bot starting")
-	b.Start()
+	go func() {
+		b.Start()
+	}()
+	<-ctx.Done()
+	b.Stop()
+
 }
