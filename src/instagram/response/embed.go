@@ -146,7 +146,11 @@ func (s EmbedResponse) IsVideo() bool {
 
 // GetCaption of the Media
 func (s EmbedResponse) GetCaption() string {
-	return s.Media.Caption.Edges[0].Node.Text
+	if len(s.Media.Caption.Edges) > 0 {
+		return s.Media.Caption.Edges[0].Node.Text
+	}
+
+	return s.Media.Title
 }
 
 // ExtractMediaURL will extract the Media URL automatically based on Media type (video or image)
