@@ -49,7 +49,7 @@ spec:
             {{- toYaml .Values.resources | nindent 12 }}
           env:
             - name: APP_ENV
-              value: prod
+              value: production
             - name: BOT_TOKEN
               value: {{ .Values.image.token }}
 
