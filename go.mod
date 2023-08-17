@@ -4,7 +4,7 @@ go 1.19
 
 require (
 	github.com/EDDYCJY/fake-useragent v0.2.0
-	github.com/gin-gonic/gin v1.9.0
+	github.com/gin-gonic/gin v1.9.1
 	github.com/gocolly/colly/v2 v2.1.0
 	github.com/pkg/errors v0.9.1
 	github.com/prometheus/client_golang v1.15.1
