@@ -10,7 +10,7 @@ require (
 	github.com/prometheus/client_golang v1.15.1
 	github.com/sirupsen/logrus v1.9.2
 	github.com/stretchr/testify v1.8.4
-	github.com/urfave/cli/v2 v2.25.5
+	github.com/urfave/cli/v2 v2.25.7
 	gopkg.in/telebot.v3 v3.1.3
 )
 
