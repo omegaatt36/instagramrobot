@@ -1,4 +1,4 @@
-FROM golang:1.19-alpine as build
+FROM golang:1.20-alpine as build
 
 # Set the working directory
 WORKDIR /go/src/app
@@ -37,11 +37,7 @@ CMD ["go", "run", "."]
 #
 # Production build
 #
-FROM alpine:3.14.1 as prod
-
-# By default, Docker runs container as root which inside of the container can pose as a security issue.
-RUN addgroup -S app && adduser -S -G app app
-USER app
+FROM gcr.io/distroless/static-debian12 as prod
 
 # Set the working directory
 WORKDIR /home/app/
