@@ -45,7 +45,7 @@ func (l *LinkProcessor) ProcessLink(link string) error {
 		return err
 	}
 
-	logging.Infof("chatID(%s) shortcode(%s)", l.msg.Sender.ID, shortCode)
+	logging.Infof("chatID(%d) shortcode(%s)", l.msg.Sender.ID, shortCode)
 
 	// Process fetching the short code from Instagram
 	response, err := instagram.GetPostWithCode(shortCode)
