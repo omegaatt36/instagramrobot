@@ -5,7 +5,7 @@ import (
 
 	"github.com/omegaatt36/instagramrobot/app"
 	"github.com/omegaatt36/instagramrobot/app/bot"
-	"github.com/omegaatt36/instagramrobot/config"
+	"github.com/omegaatt36/instagramrobot/app/bot/config"
 	"github.com/omegaatt36/instagramrobot/health"
 	"github.com/omegaatt36/instagramrobot/logging"
 	"github.com/urfave/cli/v2"
@@ -13,7 +13,7 @@ import (
 
 // Main is the entry point of the application.
 func Main(ctx context.Context) {
-	logging.Init()
+	logging.Init(!config.IsLocal())
 
 	go health.StartServer()
 

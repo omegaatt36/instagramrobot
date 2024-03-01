@@ -4,7 +4,6 @@ import (
 	"context"
 	"os"
 
-	"github.com/omegaatt36/instagramrobot/config"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
 )
@@ -14,7 +13,7 @@ var (
 )
 
 // Init initializes the logger.
-func Init() {
+func Init(isProd bool) {
 	level := zapcore.DebugLevel
 	if defaultConfig.logLevel != "" {
 		if err := level.Set(defaultConfig.logLevel); err != nil {
@@ -25,7 +24,7 @@ func Init() {
 	encoderConfig := zap.NewDevelopmentEncoderConfig()
 	getEncoder := zapcore.NewConsoleEncoder
 
-	if !config.IsLocal() {
+	if isProd {
 		encoderConfig = zap.NewProductionEncoderConfig()
 		encoderConfig.MessageKey = "message"
 		encoderConfig.LevelKey = "severity"
@@ -43,10 +42,6 @@ func Init() {
 	)
 
 	logger = zap.New(core, zap.AddCaller())
-
-	if !config.IsLocal() {
-		logger = logger.With(zap.String("env", config.GetAppEnv()))
-	}
 
 	sugar := logger.Sugar()
 

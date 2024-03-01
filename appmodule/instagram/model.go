@@ -1,6 +1,9 @@
-package response
+package instagram
 
-import "github.com/omegaatt36/instagramrobot/src/types"
+import (
+	"strconv"
+	"time"
+)
 
 // Dimensions of the media
 type Dimensions struct {
@@ -71,10 +74,6 @@ type SliderItemNode struct {
 	Title          string `json:"title"`            // The video title
 	VideoURL       string `json:"video_url"`        // Direct URL to the Video
 	VideoViewCount uint64 `json:"video_view_count"` // The number of times Video has been viewed
-
-	// clips_music_attribution_info
-	// media_overlay_info
-	// sharing_friction_info
 }
 
 // ExtractMediaURL will extract the Media URL automatically based on Media type (video or image)
@@ -100,7 +99,7 @@ type Media struct {
 	Shortcode        string     `json:"shortcode"`             // Unique shortcode of the Media
 	Type             string     `json:"__typename"`            // Type of the Media
 	ProductType      string     `json:"product_type"`          // Product type of the Media
-	TakenAt          types.Time `json:"taken_at_timestamp"`    // The time this media was taken/published
+	TakenAt          Time       `json:"taken_at_timestamp"`    // The time this media was taken/published
 	CommenterCount   uint64     `json:"commenter_count"`       // Count of Users who have commented
 	Comments         WithCount  `json:"edge_media_to_comment"` // Comments count
 	Likes            WithCount  `json:"edge_liked_by"`         // Likes count
@@ -117,16 +116,6 @@ type Media struct {
 	VideoViewCount uint64 `json:"video_view_count"` // The number of times Video has been viewed
 
 	SliderItems SliderItems `json:"edge_sidecar_to_children"` // Children of the Media
-
-	// clips_music_attribution_info
-	// media_overlay_info
-	// sharing_friction_info
-
-	// edge_media_to_sponsor_user
-	// is_affiliate
-	// is_paid_partnership
-	// location
-	// coauthor_producers
 }
 
 // EmbedResponse base
@@ -159,4 +148,40 @@ func (s EmbedResponse) ExtractMediaURL() string {
 		return s.Media.VideoURL
 	}
 	return s.Media.DisplayURL
+}
+
+// Time defines a timestamp encoded as epoch seconds in JSON
+type Time time.Time
+
+// MarshalJSON is used to convert the timestamp to JSON
+func (t Time) MarshalJSON() ([]byte, error) {
+	return []byte(strconv.FormatInt(time.Time(t).Unix(), 10)), nil
+}
+
+// UnmarshalJSON is used to convert the timestamp from JSON
+func (t *Time) UnmarshalJSON(s []byte) (err error) {
+	r := string(s)
+	q, err := strconv.ParseInt(r, 10, 64)
+	if err != nil {
+		return err
+	}
+	*(*time.Time)(t) = time.Unix(q, 0)
+	return nil
+}
+
+// Unix returns t as a Unix time, the number of seconds elapsed
+// since January 1, 1970 UTC. The result does not depend on the
+// location associated with t.
+func (t Time) Unix() int64 {
+	return time.Time(t).Unix()
+}
+
+// Time returns the JSON time as a time.Time instance in UTC
+func (t Time) Time() time.Time {
+	return time.Time(t).UTC()
+}
+
+// String returns t as a formatted string
+func (t Time) String() string {
+	return t.Time().String()
 }

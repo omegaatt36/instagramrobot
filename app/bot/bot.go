@@ -4,9 +4,8 @@ import (
 	"context"
 	"time"
 
-	"github.com/omegaatt36/instagramrobot/appmodule/telegram/commands"
-	"github.com/omegaatt36/instagramrobot/appmodule/telegram/events"
-	"github.com/omegaatt36/instagramrobot/config"
+	"github.com/omegaatt36/instagramrobot/app/bot/api"
+	"github.com/omegaatt36/instagramrobot/app/bot/config"
 	"github.com/omegaatt36/instagramrobot/logging"
 	"gopkg.in/telebot.v3"
 )
@@ -39,13 +38,10 @@ func Register(botToken string) error {
 }
 
 func registerCommands() {
-	// Commands
-	start := commands.Start{B: b}
-	b.Handle("/start", start.Handler)
+	x := api.NewController(b)
 
-	// Events
-	text := events.NewTextHandler(b)
-	b.Handle(telebot.OnText, text.Handler)
+	b.Handle("/start", x.OnStart)
+	b.Handle(telebot.OnText, x.OnText)
 }
 
 // Start brings bot into motion by consuming incoming updates

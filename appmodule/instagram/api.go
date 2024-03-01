@@ -13,33 +13,65 @@ import (
 
 	browser "github.com/EDDYCJY/fake-useragent"
 	"github.com/gocolly/colly/v2"
-	"github.com/omegaatt36/instagramrobot/appmodule/instagram/response"
-	"github.com/omegaatt36/instagramrobot/appmodule/instagram/transform"
+	"github.com/omegaatt36/instagramrobot/domain"
 )
 
-var (
-	client = &http.Client{
-		Timeout: 10 * time.Second,
-		Transport: &http.Transport{
-			Dial: (&net.Dialer{
-				Timeout: 5 * time.Second,
-			}).Dial,
-			TLSHandshakeTimeout: 5 * time.Second,
+// InstagramFetcherRepo is the repository for fetching Instagram media.
+type InstagramFetcherRepo struct {
+	client *http.Client
+}
+
+// NewInstagramFetcherRepo will create a new instance of InstagramFetcherRepo.
+func NewInstagramFetcherRepo() domain.InstagramFetcher {
+	return &InstagramFetcherRepo{
+		client: &http.Client{
+			Timeout: 10 * time.Second,
+			Transport: &http.Transport{
+				Dial: (&net.Dialer{
+					Timeout: 5 * time.Second,
+				}).Dial,
+				TLSHandshakeTimeout: 5 * time.Second,
+			},
 		},
 	}
-)
+}
+
+// fromEmbedResponse will automatically transforms the EmbedResponse to the Media
+func fromEmbedResponse(embed EmbedResponse) domain.Media {
+	media := domain.Media{
+		Id:        embed.Media.Id,
+		Shortcode: embed.Media.Shortcode,
+		Type:      embed.Media.Type,
+		Comments:  embed.Media.Comments.Count,
+		Likes:     embed.Media.Likes.Count,
+		Url:       embed.ExtractMediaURL(),
+		TakenAt:   embed.Media.TakenAt.Unix(),
+		IsVideo:   embed.IsVideo(),
+		Caption:   embed.GetCaption(),
+	}
+
+	for _, item := range embed.Media.SliderItems.Edges {
+		media.Items = append(media.Items, domain.MediaItem{
+			Id:        item.Node.Id,
+			Shortcode: item.Node.Shortcode,
+			Type:      item.Node.Type,
+			IsVideo:   item.Node.IsVideo,
+			Url:       item.Node.ExtractMediaURL(),
+		})
+	}
+
+	return media
+}
 
 // GetPostWithCode lets you to get information about specific Instagram post
 // by providing its unique short code
-func GetPostWithCode(code string) (transform.Media, error) {
-	// TODO: validate code
-
+func (repo *InstagramFetcherRepo) GetPostWithCode(code string) (domain.Media, error) {
 	URL := fmt.Sprintf("https://www.instagram.com/p/%v/embed/captioned/", code)
 
 	var embeddedMediaImage string
-	var embedResponse = response.EmbedResponse{}
+	var embedResponse = EmbedResponse{}
 	collector := colly.NewCollector()
-	collector.SetClient(client)
+	collector.SetClient(repo.client)
 
 	collector.OnHTML("img.EmbeddedMediaImage", func(e *colly.HTMLElement) {
 		embeddedMediaImage = e.Attr("src")
@@ -68,23 +100,23 @@ func GetPostWithCode(code string) (transform.Media, error) {
 	})
 
 	if err := collector.Visit(URL); err != nil {
-		return transform.Media{}, fmt.Errorf("failed to send HTTP request to the Instagram: %v", err)
+		return domain.Media{}, fmt.Errorf("failed to send HTTP request to the Instagram: %v", err)
 	}
 
 	// If the method one which is JSON parsing didn't fail
 	if !embedResponse.IsEmpty() {
 		// Transform the Embed response and return
-		return transform.FromEmbedResponse(embedResponse), nil
+		return fromEmbedResponse(embedResponse), nil
 	}
 
 	if embeddedMediaImage != "" {
-		return transform.Media{
+		return domain.Media{
 			Url: embeddedMediaImage,
 		}, nil
 	}
 
 	// If every two methods have failed, then return an error
-	return transform.Media{}, errors.New("failed to fetch the post\nthe page might be \"private\", or\nthe link is completely wrong")
+	return domain.Media{}, errors.New("failed to fetch the post\nthe page might be \"private\", or\nthe link is completely wrong")
 }
 
 // ExtractShortCodeFromLink will extract the media short code from a URL link or path
