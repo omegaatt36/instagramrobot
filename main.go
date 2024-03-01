@@ -21,8 +21,9 @@ func Main(ctx context.Context) {
 		logging.Fatalf("couldn't register the Telegram bot: %v", err)
 	}
 
-	telegram.Start(ctx)
+	stopped := telegram.Start(ctx)
 
+	<-stopped
 	<-ctx.Done()
 	logging.Info("Shutting down")
 }

@@ -7,7 +7,6 @@ import (
 	"os/signal"
 	"runtime/debug"
 	"syscall"
-	"time"
 
 	"github.com/omegaatt36/instagramrobot/app/cliflag"
 	"github.com/pkg/errors"
@@ -59,7 +58,6 @@ func (a *App) wrapMain(c *cli.Context) error {
 	}()
 
 	a.Main(ctx)
-	time.Sleep(3 * time.Second)
 	log.Println("terminated")
 
 	return nil

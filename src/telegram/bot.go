@@ -49,11 +49,20 @@ func registerCommands() {
 }
 
 // Start brings bot into motion by consuming incoming updates
-func Start(ctx context.Context) {
+func Start(ctx context.Context) <-chan struct{} {
 	logging.Info("Telegram bot starting")
+	closeChain := make(chan struct{})
+	go b.Start()
 	go func() {
-		b.Start()
+		defer func() {
+			logging.Info("Telegram bot stopped")
+			closeChain <- struct{}{}
+			close(closeChain)
+		}()
+
 		<-ctx.Done()
 		b.Stop()
 	}()
+
+	return closeChain
 }
