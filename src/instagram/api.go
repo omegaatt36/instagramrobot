@@ -30,7 +30,7 @@ var (
 )
 
 // GetPostWithCode lets you to get information about specific Instagram post
-// by providing its unique shortcode
+// by providing its unique short code
 func GetPostWithCode(code string) (transform.Media, error) {
 	// TODO: validate code
 
@@ -85,15 +85,14 @@ func GetPostWithCode(code string) (transform.Media, error) {
 
 	// If every two methods have failed, then return an error
 	return transform.Media{}, errors.New("failed to fetch the post\nthe page might be \"private\", or\nthe link is completely wrong")
-
 }
 
-// ExtractShortcodeFromLink will extract the media shortcode from a URL link or path
-func ExtractShortcodeFromLink(link string) (string, error) {
+// ExtractShortCodeFromLink will extract the media short code from a URL link or path
+func ExtractShortCodeFromLink(link string) (string, error) {
 	values := regexp.MustCompile(`(p|tv|reel|reels\/videos)\/([A-Za-z0-9-_]+)`).FindStringSubmatch(link)
 	if len(values) != 3 {
-		return "", errors.New("couldn't extract the media shortcode from the link")
+		return "", errors.New("couldn't extract the media short code from the link")
 	}
-	// return shortcode
+	// return short code
 	return values[2], nil
 }

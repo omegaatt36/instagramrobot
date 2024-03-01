@@ -1,10 +1,10 @@
 package events
 
 import (
+	"github.com/omegaatt36/instagramrobot/logging"
 	"github.com/omegaatt36/instagramrobot/src/helpers"
 	"github.com/omegaatt36/instagramrobot/src/telegram/providers"
 	"github.com/omegaatt36/instagramrobot/src/telegram/utils"
-	log "github.com/sirupsen/logrus"
 	"gopkg.in/telebot.v3"
 )
 
@@ -28,7 +28,7 @@ func (l *TextHandler) Handler(c telebot.Context) error {
 			return nil
 		}
 
-		log.Error("Invalid command,\nPlease send the Instagram post link.")
+		logging.Error("Invalid command,\nPlease send the Instagram post link.")
 		return utils.ReplyError(c, "Invalid command,\nPlease send the Instagram post link.")
 	}
 
@@ -37,7 +37,7 @@ func (l *TextHandler) Handler(c telebot.Context) error {
 			return nil
 		}
 
-		log.Error(err)
+		logging.Error(err)
 		return utils.ReplyError(c, err.Error())
 	}
 

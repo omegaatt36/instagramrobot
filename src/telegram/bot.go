@@ -4,10 +4,10 @@ import (
 	"context"
 	"time"
 
-	"github.com/omegaatt36/instagramrobot/src/config"
+	"github.com/omegaatt36/instagramrobot/config"
+	"github.com/omegaatt36/instagramrobot/logging"
 	"github.com/omegaatt36/instagramrobot/src/telegram/commands"
 	"github.com/omegaatt36/instagramrobot/src/telegram/events"
-	log "github.com/sirupsen/logrus"
 	"gopkg.in/telebot.v3"
 )
 
@@ -19,18 +19,17 @@ func Register(botToken string) error {
 	bot, err := telebot.NewBot(telebot.Settings{
 		Token:   botToken,
 		Poller:  &telebot.LongPoller{Timeout: 10 * time.Second},
-		Verbose: config.IsDevelopment(),
+		Verbose: !config.IsProduction(),
 	})
 	if err != nil {
-		log.Error("Couldn't create the Telegram bot instance")
-		log.Fatal(err)
+		logging.Error("Couldn't create the Telegram bot instance")
+		logging.Fatal(err)
 	}
 	b = bot
-	log.WithFields(log.Fields{
-		"id":       b.Me.ID,
-		"username": b.Me.Username,
-		"title":    b.Me.FirstName,
-	}).Info("Telegram bot instance created")
+
+	logging.Info("Telegram bot instance created")
+	logging.Infof("Bot info: id(%d) username(%s) title(%s)",
+		b.Me.ID, b.Me.Username, b.Me.FirstName)
 
 	registerCommands()
 
@@ -51,11 +50,10 @@ func registerCommands() {
 
 // Start brings bot into motion by consuming incoming updates
 func Start(ctx context.Context) {
-	log.Warn("Telegram bot starting")
+	logging.Info("Telegram bot starting")
 	go func() {
 		b.Start()
+		<-ctx.Done()
+		b.Stop()
 	}()
-	<-ctx.Done()
-	b.Stop()
-
 }

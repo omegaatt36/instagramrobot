@@ -11,7 +11,6 @@ fmt:
 	go mod tidy
 
 check:
-	find . -name "*.json" | xargs -n 1 -t gojq . >/dev/null
 	go vet -all ./...
 	golangci-lint run
 	misspell -error */**

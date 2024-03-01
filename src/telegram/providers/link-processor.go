@@ -3,10 +3,10 @@ package providers
 import (
 	"net/url"
 
+	"github.com/omegaatt36/instagramrobot/logging"
 	"github.com/omegaatt36/instagramrobot/src/instagram"
 	"github.com/omegaatt36/instagramrobot/src/telegram/utils"
 	"github.com/pkg/errors"
-	log "github.com/sirupsen/logrus"
 	"gopkg.in/telebot.v3"
 )
 
@@ -39,19 +39,16 @@ func (l *LinkProcessor) ProcessLink(link string) error {
 		return errors.Wrapf(utils.ErrInvalidHost, "can only process links from [instagram.com] not [%s]", url.Host)
 	}
 
-	// Extract shortcode
-	shortcode, err := instagram.ExtractShortcodeFromLink(url.Path)
+	// Extract short code
+	shortCode, err := instagram.ExtractShortCodeFromLink(url.Path)
 	if err != nil {
 		return err
 	}
 
-	log.WithFields(log.Fields{
-		"chat_id":   l.msg.Sender.ID,
-		"shortcode": shortcode,
-	}).Infof("Processing link")
+	logging.Infof("chatID(%s) shortcode(%s)", l.msg.Sender.ID, shortCode)
 
-	// Process fetching the shortcode from Instagram
-	response, err := instagram.GetPostWithCode(shortcode)
+	// Process fetching the short code from Instagram
+	response, err := instagram.GetPostWithCode(shortCode)
 	if err != nil {
 		return err
 	}
@@ -70,7 +67,7 @@ func (l *LinkProcessor) CheckIndexForSpam(index int) bool {
 	// TODO: load from Config
 	AllowedLinksPerMessage := 3
 	if index == AllowedLinksPerMessage {
-		log.Errorf("can't process more than %c links per message", AllowedLinksPerMessage)
+		logging.Errorf("can't process more than %c links per message", AllowedLinksPerMessage)
 		return true
 	}
 

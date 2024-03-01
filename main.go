@@ -4,30 +4,27 @@ import (
 	"context"
 
 	"github.com/omegaatt36/instagramrobot/app"
-	"github.com/omegaatt36/instagramrobot/src/config"
+	"github.com/omegaatt36/instagramrobot/config"
+	"github.com/omegaatt36/instagramrobot/logging"
 	"github.com/omegaatt36/instagramrobot/src/health"
-	"github.com/omegaatt36/instagramrobot/src/helpers"
 	"github.com/omegaatt36/instagramrobot/src/telegram"
-	log "github.com/sirupsen/logrus"
 	"github.com/urfave/cli/v2"
 )
 
+// Main is the entry point of the application.
 func Main(ctx context.Context) {
+	logging.Init()
+
 	go health.StartServer()
 
-	helpers.RegisterLogger()
-
-	if config.IsDevelopment() {
-		log.SetLevel(log.DebugLevel)
-	} else {
-		log.SetLevel(log.InfoLevel)
-	}
-
 	if err := telegram.Register(config.BotToken()); err != nil {
-		log.Fatalf("Couldn't register the Telegram bot: %v", err)
+		logging.Fatalf("couldn't register the Telegram bot: %v", err)
 	}
 
 	telegram.Start(ctx)
+
+	<-ctx.Done()
+	logging.Info("Shutting down")
 }
 
 func main() {

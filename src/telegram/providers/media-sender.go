@@ -1,9 +1,9 @@
 package providers
 
 import (
+	"github.com/omegaatt36/instagramrobot/logging"
 	"github.com/omegaatt36/instagramrobot/src/instagram/transform"
 	"github.com/pkg/errors"
-	log "github.com/sirupsen/logrus"
 	"gopkg.in/telebot.v3"
 )
 
@@ -39,7 +39,7 @@ func (m *MediaSender) sendSingleMedia() error {
 			return errors.Wrap(err, "couldn't send the single video")
 		}
 
-		log.Debugf("Sent single video with short code [%v]", m.media.Shortcode)
+		logging.Debugf("Sent single video with short code [%v]", m.media.Shortcode)
 	} else {
 		if _, err := m.bot.Send(m.msg.Chat, &telebot.Photo{
 			File:    telebot.FromURL(m.media.Url),
@@ -48,7 +48,7 @@ func (m *MediaSender) sendSingleMedia() error {
 			return errors.Wrap(err, "couldn't send the single photo")
 		}
 
-		log.Debugf("Sent single photo with short code [%v]", m.media.Shortcode)
+		logging.Debugf("Sent single photo with short code [%v]", m.media.Shortcode)
 	}
 
 	return m.sendCaption(m.media.Caption)

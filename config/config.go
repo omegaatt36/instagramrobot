@@ -7,11 +7,13 @@ import (
 	"github.com/urfave/cli/v2"
 )
 
+// Env represents the environment of the application.
 // ENUM(
+// local
 // development
 // production
 // )
-type env string
+type Env string
 
 type config struct {
 	appEnvironment string
@@ -27,13 +29,14 @@ func init() {
 // CliFlags returns cli flags to setup cache package.
 func (cfg *config) CliFlags() []cli.Flag {
 	var flags []cli.Flag
+
 	flags = append(flags, &cli.StringFlag{
 		Name:        "app-env",
 		EnvVars:     []string{"APP_ENV"},
 		Destination: &cfg.appEnvironment,
-		Required:    true,
-		DefaultText: EnvDevelopment.String(),
-		Value:       EnvDevelopment.String(),
+		Required:    false,
+		DefaultText: EnvLocal.String(),
+		Value:       EnvLocal.String(),
 	})
 
 	flags = append(flags, &cli.StringFlag{
@@ -46,6 +49,16 @@ func (cfg *config) CliFlags() []cli.Flag {
 	return flags
 }
 
+// BotToken returns the bot token.
+func BotToken() string {
+	return defaultConfig.botToken
+}
+
+// IsLocal will return true if the APP_ENV is equals to local.
+func IsLocal() bool {
+	return defaultConfig.appEnvironment == EnvLocal.String()
+}
+
 // IsDevelopment will return true if the APP_ENV is equals to dev.
 func IsDevelopment() bool {
 	return defaultConfig.appEnvironment == EnvDevelopment.String()
@@ -56,7 +69,7 @@ func IsProduction() bool {
 	return defaultConfig.appEnvironment == EnvProduction.String()
 }
 
-// BotToken returns the bot token.
-func BotToken() string {
-	return defaultConfig.botToken
+// GetAppEnv returns the current app environment.
+func GetAppEnv() string {
+	return defaultConfig.appEnvironment
 }

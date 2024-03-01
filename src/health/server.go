@@ -2,13 +2,14 @@ package health
 
 import (
 	"errors"
+	"log"
 	"net/http"
 	"sync"
 	"time"
 
 	"github.com/gin-gonic/gin"
+	"github.com/omegaatt36/instagramrobot/logging"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
-	log "github.com/sirupsen/logrus"
 )
 
 const (
@@ -171,9 +172,9 @@ func StartServer() {
 		Handler: engine,
 	}
 
-	log.Info("starts serving health server at", srv.Addr)
+	logging.Info("starts serving health server at", srv.Addr)
 	if err := srv.ListenAndServe(); err != nil &&
 		!errors.Is(err, http.ErrServerClosed) {
-		log.Fatalf("listen: %s\n", err)
+		logging.Fatalf("listen: %s\n", err)
 	}
 }

@@ -9,9 +9,8 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/pkg/errors"
-
 	"github.com/omegaatt36/instagramrobot/app/cliflag"
+	"github.com/pkg/errors"
 	"github.com/urfave/cli/v2"
 )
 
