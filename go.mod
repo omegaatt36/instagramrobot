@@ -1,6 +1,6 @@
 module github.com/omegaatt36/instagramrobot
 
-go 1.19
+go 1.20
 
 require (
 	github.com/EDDYCJY/fake-useragent v0.2.0
@@ -9,9 +9,9 @@ require (
 	github.com/pkg/errors v0.9.1
 	github.com/prometheus/client_golang v1.15.1
 	github.com/stretchr/testify v1.8.4
-	github.com/urfave/cli/v2 v2.25.5
+	github.com/urfave/cli/v2 v2.27.1
 	go.uber.org/zap v1.27.0
-	gopkg.in/telebot.v3 v3.1.3
+	gopkg.in/telebot.v3 v3.2.1
 )
 
 require (
