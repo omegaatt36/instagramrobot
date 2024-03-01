@@ -4,10 +4,10 @@ import (
 	"context"
 
 	"github.com/omegaatt36/instagramrobot/app"
+	"github.com/omegaatt36/instagramrobot/app/bot"
 	"github.com/omegaatt36/instagramrobot/config"
+	"github.com/omegaatt36/instagramrobot/health"
 	"github.com/omegaatt36/instagramrobot/logging"
-	"github.com/omegaatt36/instagramrobot/src/health"
-	"github.com/omegaatt36/instagramrobot/src/telegram"
 	"github.com/urfave/cli/v2"
 )
 
@@ -17,11 +17,11 @@ func Main(ctx context.Context) {
 
 	go health.StartServer()
 
-	if err := telegram.Register(config.BotToken()); err != nil {
+	if err := bot.Register(config.BotToken()); err != nil {
 		logging.Fatalf("couldn't register the Telegram bot: %v", err)
 	}
 
-	stopped := telegram.Start(ctx)
+	stopped := bot.Start(ctx)
 
 	<-stopped
 	<-ctx.Done()

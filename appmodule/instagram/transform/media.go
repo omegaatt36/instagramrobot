@@ -1,6 +1,6 @@
 package transform
 
-import "github.com/omegaatt36/instagramrobot/src/instagram/response"
+import "github.com/omegaatt36/instagramrobot/appmodule/instagram/response"
 
 // Owner is a single Instagram user who owns the Media
 type Owner struct {

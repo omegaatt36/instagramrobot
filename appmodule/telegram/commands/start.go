@@ -17,7 +17,7 @@ func (s *Start) Handler(c telebot.Context) error {
 		return nil
 	}
 
-	if err := c.Reply("Hello!"); err != nil {
+	if err := c.Reply("Hello! I'm instagram keeper, post some instagram public post/reels to me."); err != nil {
 		return errors.Wrap(err, "Couldn't sent the start command response")
 	}
 

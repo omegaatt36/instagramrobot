@@ -1,10 +1,11 @@
 package events
 
 import (
+	"regexp"
+
+	"github.com/omegaatt36/instagramrobot/appmodule/telegram/providers"
+	"github.com/omegaatt36/instagramrobot/appmodule/telegram/utils"
 	"github.com/omegaatt36/instagramrobot/logging"
-	"github.com/omegaatt36/instagramrobot/src/helpers"
-	"github.com/omegaatt36/instagramrobot/src/telegram/providers"
-	"github.com/omegaatt36/instagramrobot/src/telegram/utils"
 	"gopkg.in/telebot.v3"
 )
 
@@ -19,9 +20,16 @@ type TextHandler struct {
 	bot *telebot.Bot // Bot instance
 }
 
+// extractLinksFromString lets you to extract HTTP links from a string
+func extractLinksFromString(input string) []string {
+	regex := `(http|ftp|https)://([\w_-]+(?:(?:\.[\w_-]+)+))([\w.,@?^=%&:/~+#-]*[\w@?^=%&/~+#-])?`
+	r := regexp.MustCompile(regex)
+	return r.FindAllString(input, -1)
+}
+
 // Handler is the entry point for the incoming update
 func (l *TextHandler) Handler(c telebot.Context) error {
-	links := helpers.ExtractLinksFromString(c.Message().Text)
+	links := extractLinksFromString(c.Message().Text)
 	// Send proper error if text has no link inside
 	if len(links) == 0 {
 		if c.Chat().Type != telebot.ChatPrivate {

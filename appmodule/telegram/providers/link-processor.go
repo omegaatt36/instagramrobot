@@ -3,9 +3,9 @@ package providers
 import (
 	"net/url"
 
+	"github.com/omegaatt36/instagramrobot/appmodule/instagram"
+	"github.com/omegaatt36/instagramrobot/appmodule/telegram/utils"
 	"github.com/omegaatt36/instagramrobot/logging"
-	"github.com/omegaatt36/instagramrobot/src/instagram"
-	"github.com/omegaatt36/instagramrobot/src/telegram/utils"
 	"github.com/pkg/errors"
 	"gopkg.in/telebot.v3"
 )

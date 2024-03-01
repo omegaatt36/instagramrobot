@@ -13,8 +13,8 @@ import (
 
 	browser "github.com/EDDYCJY/fake-useragent"
 	"github.com/gocolly/colly/v2"
-	"github.com/omegaatt36/instagramrobot/src/instagram/response"
-	"github.com/omegaatt36/instagramrobot/src/instagram/transform"
+	"github.com/omegaatt36/instagramrobot/appmodule/instagram/response"
+	"github.com/omegaatt36/instagramrobot/appmodule/instagram/transform"
 )
 
 var (

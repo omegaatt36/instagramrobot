@@ -3,7 +3,7 @@
 package config
 
 import (
-	"github.com/omegaatt36/instagramrobot/app/cliflag"
+	"github.com/omegaatt36/instagramrobot/cliflag"
 	"github.com/urfave/cli/v2"
 )
 

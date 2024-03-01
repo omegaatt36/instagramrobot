@@ -1,8 +1,8 @@
 package providers
 
 import (
+	"github.com/omegaatt36/instagramrobot/appmodule/instagram/transform"
 	"github.com/omegaatt36/instagramrobot/logging"
-	"github.com/omegaatt36/instagramrobot/src/instagram/transform"
 	"github.com/pkg/errors"
 	"gopkg.in/telebot.v3"
 )

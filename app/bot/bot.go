@@ -1,13 +1,13 @@
-package telegram
+package bot
 
 import (
 	"context"
 	"time"
 
+	"github.com/omegaatt36/instagramrobot/appmodule/telegram/commands"
+	"github.com/omegaatt36/instagramrobot/appmodule/telegram/events"
 	"github.com/omegaatt36/instagramrobot/config"
 	"github.com/omegaatt36/instagramrobot/logging"
-	"github.com/omegaatt36/instagramrobot/src/telegram/commands"
-	"github.com/omegaatt36/instagramrobot/src/telegram/events"
 	"gopkg.in/telebot.v3"
 )
 
