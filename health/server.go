@@ -1,13 +1,13 @@
 package health
 
 import (
+	"encoding/json"
 	"errors"
 	"log"
 	"net/http"
 	"sync"
 	"time"
 
-	"github.com/gin-gonic/gin"
 	"github.com/omegaatt36/instagramrobot/logging"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 )
@@ -97,79 +97,54 @@ func gatherTrackers(detail bool) result {
 	}
 }
 
-func aliveHandler(ctx *gin.Context) {
-	defer ctx.Abort()
-
+func aliveHandler(w http.ResponseWriter, r *http.Request) {
 	tmpResult.Lock()
 	defer tmpResult.Unlock()
 
 	if tmpResult.alive {
-		ctx.Status(http.StatusOK)
+		w.WriteHeader(http.StatusOK)
 	} else {
-		ctx.Status(http.StatusServiceUnavailable)
+		w.WriteHeader(http.StatusServiceUnavailable)
 	}
 }
 
-func readyHandler(ctx *gin.Context) {
-	defer ctx.Abort()
-
+func readyHandler(w http.ResponseWriter, r *http.Request) {
 	tmpResult.Lock()
 	defer tmpResult.Unlock()
 
 	if tmpResult.ready {
-		ctx.Status(http.StatusOK)
+		w.WriteHeader(http.StatusOK)
 	} else {
-		ctx.Status(http.StatusServiceUnavailable)
+		w.WriteHeader(http.StatusServiceUnavailable)
 	}
 }
 
-func varHandler(ctx *gin.Context) {
-	defer ctx.Abort()
-
+func varHandler(w http.ResponseWriter, r *http.Request) {
 	tmpResult.Lock()
 	defer tmpResult.Unlock()
 
-	ctx.JSON(http.StatusOK, tmpResult.vars)
-}
-
-func prometheusHandler() gin.HandlerFunc {
-	h := promhttp.Handler()
-	return func(c *gin.Context) {
-		h.ServeHTTP(c.Writer, c.Request)
-	}
-}
-
-// RegisterToGinEngine registers health check endpoint to an existing engine.
-func RegisterToGinEngine(engine *gin.Engine) {
-	engine.GET("/alive", aliveHandler)
-	engine.GET("/ready", readyHandler)
-	engine.GET("/vars", varHandler)
-	engine.GET("/metrics", prometheusHandler())
-	engine.GET("/dump", func(c *gin.Context) {
-		gatherTrackers(true)
-	})
-}
-
-var engine *gin.Engine
-
-// Engine returns engine.
-func Engine() *gin.Engine {
-	return engine
-}
-
-func init() {
-	engine = gin.New()
-	engine.RedirectTrailingSlash = true
-	RegisterToGinEngine(engine)
+	w.WriteHeader(http.StatusOK)
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(tmpResult.vars)
 }
 
 // StartServer starts health server and blocks.
 func StartServer() {
 	go StartCollector()
 
+	r := http.NewServeMux()
+	r.HandleFunc("/alive", aliveHandler)
+	r.HandleFunc("/ready", readyHandler)
+	r.HandleFunc("/vars", varHandler)
+	r.HandleFunc("/metrics", promhttp.Handler().ServeHTTP)
+	r.HandleFunc("/dump", func(w http.ResponseWriter, r *http.Request) {
+		gatherTrackers(true)
+		w.WriteHeader(http.StatusOK)
+	})
+
 	srv := &http.Server{
 		Addr:    ":7001",
-		Handler: engine,
+		Handler: r,
 	}
 
 	logging.Info("starts serving health server at", srv.Addr)
