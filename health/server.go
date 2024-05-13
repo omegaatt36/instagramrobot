@@ -125,7 +125,9 @@ func varHandler(w http.ResponseWriter, r *http.Request) {
 
 	w.WriteHeader(http.StatusOK)
 	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(tmpResult.vars)
+	if err := json.NewEncoder(w).Encode(tmpResult.vars); err != nil {
+		logging.Error(err)
+	}
 }
 
 // StartServer starts health server and blocks.
