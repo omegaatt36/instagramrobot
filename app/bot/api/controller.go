@@ -8,7 +8,7 @@ import (
 	"github.com/omegaatt36/instagramrobot/appmodule/providers"
 	"github.com/omegaatt36/instagramrobot/appmodule/telegram"
 	"github.com/omegaatt36/instagramrobot/logging"
-	"github.com/pkg/errors"
+
 	"gopkg.in/telebot.v3"
 )
 
@@ -30,7 +30,7 @@ func (*Controller) OnStart(c telebot.Context) error {
 	}
 
 	if err := c.Reply("Hello! I'm instagram keeper, post some instagram public post/reels to me."); err != nil {
-		return errors.Wrap(err, "Couldn't sent the start command response")
+		return fmt.Errorf("couldn't sent the start command response: %w", err)
 	}
 
 	return nil
@@ -96,7 +96,7 @@ func (x *Controller) processLinks(links []string, m *telebot.Message) error {
 func (*Controller) replyError(c telebot.Context, text string) error {
 	_, err := c.Bot().Reply(c.Message(), fmt.Sprintf("⚠️ *Oops, ERROR!*\n\n`%v`", text), telebot.ModeMarkdown)
 	if err != nil {
-		return errors.Wrapf(err, "Couldn't reply the Error, chat_id: %d", c.Chat().ID)
+		return fmt.Errorf("couldn't reply the Error, chat_id: %d, err: %w", c.Chat().ID, err)
 	}
 
 	return nil

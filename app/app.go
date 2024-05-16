@@ -2,6 +2,7 @@ package app
 
 import (
 	"context"
+	"errors"
 	"log"
 	"os"
 	"os/signal"
@@ -9,7 +10,7 @@ import (
 	"syscall"
 
 	"github.com/omegaatt36/instagramrobot/cliflag"
-	"github.com/pkg/errors"
+
 	"github.com/urfave/cli/v2"
 )
 

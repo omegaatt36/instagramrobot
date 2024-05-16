@@ -1,9 +1,10 @@
 package telegram
 
 import (
+	"fmt"
+
 	"github.com/omegaatt36/instagramrobot/domain"
 	"github.com/omegaatt36/instagramrobot/logging"
-	"github.com/pkg/errors"
 	"gopkg.in/telebot.v3"
 )
 
@@ -42,7 +43,7 @@ func (m *MediaSender) sendSingleMedia(media *domain.Media) error {
 			File:    telebot.FromURL(media.Url),
 			Caption: caption,
 		}); err != nil {
-			return errors.Wrap(err, "couldn't send the single video")
+			return fmt.Errorf("couldn't send the single video, %w", err)
 		}
 
 		logging.Debugf("Sent single video with short code [%v]", media.Shortcode)
@@ -51,7 +52,7 @@ func (m *MediaSender) sendSingleMedia(media *domain.Media) error {
 			File:    telebot.FromURL(media.Url),
 			Caption: caption,
 		}); err != nil {
-			return errors.Wrap(err, "couldn't send the single photo")
+			return fmt.Errorf("couldn't send the single photo, %w", err)
 		}
 
 		logging.Debugf("Sent single photo with short code [%v]", media.Shortcode)
@@ -63,7 +64,7 @@ func (m *MediaSender) sendSingleMedia(media *domain.Media) error {
 func (m *MediaSender) sendNestedMedia(media *domain.Media) error {
 	_, err := m.bot.SendAlbum(m.msg.Chat, m.generateAlbumFromMedia(media))
 	if err != nil {
-		return errors.Wrap(err, "couldn't send the nested media")
+		return fmt.Errorf("couldn't send the nested media, %w", err)
 	}
 	return m.SendCaption(media)
 }

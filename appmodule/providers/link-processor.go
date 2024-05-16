@@ -1,11 +1,11 @@
 package providers
 
 import (
+	"fmt"
 	"net/url"
 
 	"github.com/omegaatt36/instagramrobot/appmodule/instagram"
 	"github.com/omegaatt36/instagramrobot/domain"
-	"github.com/pkg/errors"
 )
 
 // LinkProcessor is the implementation of LinkProcessor.
@@ -29,25 +29,29 @@ func (processor *LinkProcessor) ProcessLink(link string) error {
 
 	// Validate URL
 	if err != nil {
-		return errors.Wrapf(err, "I couldn't parse the [%v] link.", link)
+		return fmt.Errorf("I couldn't parse the [%v] link: %w", link, err)
 	}
 
 	// Validate HOST in the URL (only instagram.com is allowed)
 	if url.Host != "instagram.com" && url.Host != "www.instagram.com" {
-		return errors.Wrapf(ErrInvalidHost, "can only process links from [instagram.com] not [%s]", url.Host)
+		return fmt.Errorf("can only process links from [instagram.com] not [%s], %w", url.Host, ErrInvalidHost)
 	}
 
 	// Extract short code
 	shortCode, err := instagram.ExtractShortCodeFromLink(url.Path)
 	if err != nil {
-		return errors.Wrapf(err, "couldn't extract the short code from the link [%s]", link)
+		return fmt.Errorf("couldn't extract the short code from the link [%s]: %w", link, err)
 	}
 
 	// Process fetching the short code from Instagram
 	response, err := processor.InstagramFetcher.GetPostWithCode(shortCode)
 	if err != nil {
-		return errors.Wrapf(err, "couldn't fetch the post with short code [%s]", shortCode)
+		return fmt.Errorf("couldn't fetch the post with short code [%s]: %w", shortCode, err)
 	}
 
-	return errors.Wrapf(processor.MediaSender.Send(&response), "couldn't send the media with short code [%s]", shortCode)
+	if err := processor.MediaSender.Send(&response); err != nil {
+		return fmt.Errorf("couldn't send the media with short code [%s], %w", shortCode, err)
+	}
+
+	return nil
 }

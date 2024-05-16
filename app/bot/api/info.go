@@ -1,7 +1,8 @@
 package api
 
 import (
-	"github.com/pkg/errors"
+	"fmt"
+
 	"gopkg.in/telebot.v3"
 )
 
@@ -13,7 +14,7 @@ func HandlerStart(c telebot.Context) error {
 	}
 
 	if err := c.Reply("Hello! I'm instagram keeper, post some instagram public post/reels to me."); err != nil {
-		return errors.Wrap(err, "Couldn't sent the start command response")
+		return fmt.Errorf("couldn't sent the start command response: %w", err)
 	}
 
 	return nil
