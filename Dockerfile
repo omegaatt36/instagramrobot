@@ -21,7 +21,7 @@ ENV CGO_ENABLED=0
 ENV GOPROXY=https://proxy.golang.org
 
 # Executable filename (binary file)
-ENV APP_NAME=igbot
+ENV APP_NAME=insta-fetcher
 
 # Build binary file
 RUN ["go", "build", "-o", "build/${APP_NAME}"]

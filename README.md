@@ -82,14 +82,14 @@ If you're not familiar with Docker, [this guide](https://docs.docker.com/get-sta
 
 ### Building the container
 
-```
-docker-compose build
+```sh
+docker compose build
 ```
 
 ### Running the container
 
-```
-docker-compose up
+```sh
+docker compose up
 ```
 
 ## Installing as a service
@@ -100,22 +100,22 @@ Make sure that the project files exists in the `/usr/local/instagramrobot` direc
 
 > If you don't have Go installed, [click here](https://golang.org/doc/install) and follow its instructions.
 
-```
-go build -o bin/igbot
+```sh
+go build -o bin/insta-fetcher
 ```
 
 ### Register the service
 
-Start by creating the `/etc/systemd/system/igbot.service` file.
+Start by creating the `/etc/systemd/system/insta-fetcher.service` file.
 
-```
+```sh
 [Unit]
 Description=Telegram Instagram Bot Service
 
 [Service]
 WorkingDirectory=/usr/local/instagramrobot/bin
 User=root
-ExecStart=/usr/local/instagramrobot/bin/igbot --config-path [CONFIG_PATH]
+ExecStart=/usr/local/instagramrobot/bin/insta-fetcher --bot-token=FILL_ME
 Restart=on-failure
 RestartPreventExitStatus=23
 
@@ -123,16 +123,16 @@ RestartPreventExitStatus=23
 WantedBy=multi-user.target
 ```
 
-Don't forget to replace the `[CONFIG_PATH]` with the correct path of configuration file.
+Don't forget to replace the `--bot-token=FILL_ME` with the correct bot token.
 
 ### Enable the service at boot
 
-```
-systemctl enable igbot
+```sh
+systemctl enable insta-fetcher
 ```
 
 ### Start the service
 
-```
-systemctl start igbot
+```sh
+systemctl start insta-fetcher
 ```

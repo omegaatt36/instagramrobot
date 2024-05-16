@@ -7,5 +7,6 @@ services:
       context: ./
       dockerfile: Dockerfile
       target: ${APP_ENV}
-    env_file:
-      - .env
+    environment:
+      - APP_ENV=prod
+      - BOT_TOKEN=FILL_ME
