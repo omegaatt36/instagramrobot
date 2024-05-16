@@ -4,7 +4,7 @@ package domain
 // which is similar to the Instagram Media struct
 type MediaItem struct {
 	Id        string `json:"id"`
-	Shortcode string `json:"shortcode"`
+	ShortCode string `json:"shortcode"`
 	Type      string `json:"type"`
 	IsVideo   bool   `json:"is_video"`
 	Url       string `json:"url"`
@@ -13,7 +13,7 @@ type MediaItem struct {
 // Media which contains a single Instagram post
 type Media struct {
 	Id        string      `json:"id"`
-	Shortcode string      `json:"shortcode"`
+	ShortCode string      `json:"shortcode"`
 	Type      string      `json:"type"`
 	Comments  uint64      `json:"comments_count"`
 	Likes     uint64      `json:"likes_count"`

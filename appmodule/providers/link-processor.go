@@ -29,12 +29,12 @@ func (processor *LinkProcessor) ProcessLink(link string) error {
 
 	// Validate URL
 	if err != nil {
-		return fmt.Errorf("I couldn't parse the [%v] link: %w", link, err)
+		return fmt.Errorf("couldn't parse the [%v] link: %w", link, err)
 	}
 
 	// Validate HOST in the URL (only instagram.com is allowed)
 	if url.Host != "instagram.com" && url.Host != "www.instagram.com" {
-		return fmt.Errorf("can only process links from [instagram.com] not [%s], %w", url.Host, ErrInvalidHost)
+		return fmt.Errorf("can only process links from [instagram.com] not [%s]", url.Host)
 	}
 
 	// Extract short code

@@ -21,8 +21,8 @@ type InstagramFetcherRepo struct {
 	client *http.Client
 }
 
-// NewInstagramFetcherRepo will create a new instance of InstagramFetcherRepo.
-func NewInstagramFetcherRepo() domain.InstagramFetcher {
+// NewInstagramFetcher will create a new instance of InstagramFetcherRepo.
+func NewInstagramFetcher() domain.InstagramFetcher {
 	return &InstagramFetcherRepo{
 		client: &http.Client{
 			Timeout: 10 * time.Second,
@@ -40,7 +40,7 @@ func NewInstagramFetcherRepo() domain.InstagramFetcher {
 func fromEmbedResponse(embed EmbedResponse) domain.Media {
 	media := domain.Media{
 		Id:        embed.Media.Id,
-		Shortcode: embed.Media.Shortcode,
+		ShortCode: embed.Media.ShortCode,
 		Type:      embed.Media.Type,
 		Comments:  embed.Media.Comments.Count,
 		Likes:     embed.Media.Likes.Count,
@@ -53,7 +53,7 @@ func fromEmbedResponse(embed EmbedResponse) domain.Media {
 	for _, item := range embed.Media.SliderItems.Edges {
 		media.Items = append(media.Items, domain.MediaItem{
 			Id:        item.Node.Id,
-			Shortcode: item.Node.Shortcode,
+			ShortCode: item.Node.ShortCode,
 			Type:      item.Node.Type,
 			IsVideo:   item.Node.IsVideo,
 			Url:       item.Node.ExtractMediaURL(),

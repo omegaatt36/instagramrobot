@@ -74,8 +74,8 @@ func (x *Controller) OnText(c telebot.Context) error {
 func (x *Controller) processLinks(links []string, m *telebot.Message) error {
 	for index, link := range links {
 		linkProcessor := providers.NewLinkProcessor(
-			instagram.NewInstagramFetcherRepo(),
-			telegram.NewMediaSenderImpl(x.bot, m),
+			instagram.NewInstagramFetcher(),
+			telegram.NewMediaSender(x.bot, m),
 		)
 
 		if index == 3 {

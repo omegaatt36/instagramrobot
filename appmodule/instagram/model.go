@@ -63,7 +63,7 @@ type Owner struct {
 // SliderItemNode contains information about the Instagram post
 type SliderItemNode struct {
 	Id               string     `json:"id"`                // Unique ID of the Media
-	Shortcode        string     `json:"shortcode"`         // Unique shortcode of the Media
+	ShortCode        string     `json:"shortcode"`         // Unique short code of the Media
 	Type             string     `json:"__typename"`        // Type of the Media
 	ProductType      string     `json:"product_type"`      // Product type of the Media
 	Dimensions       Dimensions `json:"dimensions"`        // Dimension of the Media
@@ -96,7 +96,7 @@ type SliderItems struct {
 // Media which contains a single Instagram post
 type Media struct {
 	Id               string     `json:"id"`                    // Unique ID of the Media
-	Shortcode        string     `json:"shortcode"`             // Unique shortcode of the Media
+	ShortCode        string     `json:"shortcode"`             // Unique shortcode of the Media
 	Type             string     `json:"__typename"`            // Type of the Media
 	ProductType      string     `json:"product_type"`          // Product type of the Media
 	TakenAt          Time       `json:"taken_at_timestamp"`    // The time this media was taken/published

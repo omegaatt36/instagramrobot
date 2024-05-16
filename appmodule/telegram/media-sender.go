@@ -13,8 +13,8 @@ type MediaSender struct {
 	msg *telebot.Message
 }
 
-// NewMediaSenderImpl creates a new MediaSenderImpl instance
-func NewMediaSenderImpl(bot *telebot.Bot, msg *telebot.Message) domain.MediaSender {
+// NewMediaSender creates a new MediaSenderImpl instance
+func NewMediaSender(bot *telebot.Bot, msg *telebot.Message) domain.MediaSender {
 	return &MediaSender{
 		bot: bot,
 		msg: msg,
@@ -27,7 +27,7 @@ const (
 
 // Send will start to process Media and eventually send it to the Telegram chat
 func (m *MediaSender) Send(media *domain.Media) error {
-	logging.Infof("chatID(%d) shortcode(%s)", m.msg.Sender.ID, media.Shortcode)
+	logging.Infof("chatID(%d) short code(%s)", m.msg.Sender.ID, media.ShortCode)
 
 	// Check if media has no child item
 	if len(media.Items) == 0 {
@@ -46,7 +46,7 @@ func (m *MediaSender) sendSingleMedia(media *domain.Media) error {
 			return fmt.Errorf("couldn't send the single video, %w", err)
 		}
 
-		logging.Debugf("Sent single video with short code [%v]", media.Shortcode)
+		logging.Debugf("Sent single video with short code [%v]", media.ShortCode)
 	} else {
 		if _, err := m.bot.Send(m.msg.Chat, &telebot.Photo{
 			File:    telebot.FromURL(media.Url),
@@ -55,7 +55,7 @@ func (m *MediaSender) sendSingleMedia(media *domain.Media) error {
 			return fmt.Errorf("couldn't send the single photo, %w", err)
 		}
 
-		logging.Debugf("Sent single photo with short code [%v]", media.Shortcode)
+		logging.Debugf("Sent single photo with short code [%v]", media.ShortCode)
 	}
 
 	return m.SendCaption(media)
