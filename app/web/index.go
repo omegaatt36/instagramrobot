@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"strings"
 	"text/template"
 
 	"github.com/omegaatt36/instagramrobot/appmodule/instagram"
@@ -18,7 +19,8 @@ import (
 var indexHTML embed.FS
 
 type Item struct {
-	URL string
+	URL     string
+	IsVideo bool
 }
 
 // handler function #1 - returns the index.html template, with film data
@@ -69,7 +71,8 @@ func (s *Server) addFilm(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 		items = append(items, Item{
-			URL: link,
+			IsVideo: media.IsVideo,
+			URL:     link,
 		})
 	} else {
 		for _, item := range media.Items {
@@ -80,13 +83,16 @@ func (s *Server) addFilm(w http.ResponseWriter, r *http.Request) {
 				return
 			}
 			items = append(items, Item{
-				URL: link,
+				IsVideo: media.IsVideo,
+				URL:     link,
 			})
 		}
 	}
 
+	captionWithBreaks := strings.ReplaceAll(media.Caption, "\n", "<br>")
+
 	if err := index.ExecuteTemplate(w, "instagram-item-element", map[string]any{
-		"Caption": media.Caption,
+		"Caption": captionWithBreaks,
 		"Items":   items,
 	}); err != nil {
 		logging.ErrorCtx(r.Context(), err)
@@ -102,10 +108,10 @@ func parseURLToDom(link string, isVideo bool) (string, error) {
 	base64Str := encodeToBase64(bs)
 
 	if isVideo {
-		return fmt.Sprintf(`<video src='data:video/mp4;base64,%s' controls style="max-width: 300px; height: auto;"/>`, base64Str), nil
+		return fmt.Sprintf(`data:video/mp4;base64,%s`, base64Str), nil
 	}
 
-	return fmt.Sprintf(`<img src='data:image/jpeg;base64,%s' style="max-width: 300px; height: auto;"/>`, base64Str), nil
+	return fmt.Sprintf(`data:image/jpeg;base64,%s`, base64Str), nil
 }
 
 func downloadImage(url string) ([]byte, error) {
