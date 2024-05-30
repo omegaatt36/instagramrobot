@@ -43,14 +43,7 @@
     -   [Enable the service at boot](#enable-the-service-at-boot)
     -   [Start the service](#start-the-service)
 
-
-## Installing
-
-<!--
-
-You can download the latest version by checking the [GitHub releases](https://github.com/omegaatt36/instagramrobot/releases) page.
-
--->
+## Installing Telegram Bot
 
 Alternatively, you can download this project by cloning its Git repository:
 
@@ -58,13 +51,13 @@ Alternatively, you can download this project by cloning its Git repository:
 git clone https://github.com/omegaatt36/instagramrobot.git
 ```
 
-## Configuration
+### Configuration
 
 ```bash
 go run main.go --bot-token=***** --app-env=development
 ```
 
-## Installing via Kubernetes by using helm
+### Installing via Kubernetes by using helm
 
 ```shell
 pushd charts
@@ -72,7 +65,7 @@ helm upgrade --install -v values.yaml insta-fetcher .
 popd
 ```
 
-## Installing via Docker
+### Installing via Docker
 
 Docker is a tool designed to make it easier to create, deploy, and run applications by using containers.
 
@@ -80,23 +73,23 @@ Containers allow a developer to package up an application with all of the parts 
 
 If you're not familiar with Docker, [this guide](https://docs.docker.com/get-started/) is a great point to start.
 
-### Building the container
+#### Building the container
 
 ```sh
 docker compose build
 ```
 
-### Running the container
+#### Running the container
 
 ```sh
 docker compose up
 ```
 
-## Installing as a service
+### Installing as a service
 
 Make sure that the project files exists in the `/usr/local/instagramrobot` directory.
 
-### Build the application
+#### Build the application
 
 > If you don't have Go installed, [click here](https://golang.org/doc/install) and follow its instructions.
 
@@ -104,7 +97,7 @@ Make sure that the project files exists in the `/usr/local/instagramrobot` direc
 go build -o bin/insta-fetcher
 ```
 
-### Register the service
+#### Register the service
 
 Start by creating the `/etc/systemd/system/insta-fetcher.service` file.
 
@@ -125,14 +118,24 @@ WantedBy=multi-user.target
 
 Don't forget to replace the `--bot-token=FILL_ME` with the correct bot token.
 
-### Enable the service at boot
+#### Enable the service at boot
 
 ```sh
 systemctl enable insta-fetcher
 ```
 
-### Start the service
+#### Start the service
 
 ```sh
 systemctl start insta-fetcher
 ```
+
+## Start Web Version
+
+Powered by [HTMX](https://htmx.org/)
+
+```shell
+go run cmd/web/main.go
+```
+
+then you can open `http://localhost:8080` on your browser.
