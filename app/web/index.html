@@ -126,7 +126,7 @@
     <ul class="list-group" id="film-list">
         {{ block "instagram-item-element" .}}
         <p>{{ .Caption }}</p>
-        {{ range .Items }}
+        {{ range .Medias }}
         <li class="list-group-item">
             {{ if .IsVideo }}
             <video src="{{ .URL }}" controls onclick="openEnlargedMedia(this)"></video>

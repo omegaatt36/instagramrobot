@@ -18,7 +18,7 @@ import (
 //go:embed index.html
 var indexHTML embed.FS
 
-type Item struct {
+type media struct {
 	URL     string
 	IsVideo bool
 }
@@ -54,64 +54,63 @@ func (s *Server) addFilm(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	media, err := instagram.NewInstagramFetcher().GetPostWithCode(shortCode)
+	domainMedia, err := instagram.NewInstagramFetcher().GetPostWithCode(shortCode)
 	if err != nil {
 		logging.ErrorCtx(r.Context(), err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 
-	items := make([]Item, 0)
+	medias := make([]media, 0)
 	// Check if media has no child item
-	if len(media.Items) == 0 {
-		link, err := parseURLToDom(media.Url, media.IsVideo)
+	if len(domainMedia.Items) == 0 {
+		m, err := encodeMediaToBase64(domainMedia.Url, domainMedia.IsVideo)
 		if err != nil {
 			logging.ErrorCtx(r.Context(), err)
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
 		}
-		items = append(items, Item{
-			IsVideo: media.IsVideo,
-			URL:     link,
-		})
+		medias = append(medias, m)
 	} else {
-		for _, item := range media.Items {
-			link, err := parseURLToDom(item.Url, item.IsVideo)
+		for _, item := range domainMedia.Items {
+			m, err := encodeMediaToBase64(item.Url, item.IsVideo)
 			if err != nil {
 				logging.ErrorCtx(r.Context(), err)
 				http.Error(w, err.Error(), http.StatusInternalServerError)
 				return
 			}
-			items = append(items, Item{
-				IsVideo: media.IsVideo,
-				URL:     link,
-			})
+
+			medias = append(medias, m)
 		}
 	}
 
-	captionWithBreaks := strings.ReplaceAll(media.Caption, "\n", "<br>")
+	captionWithBreaks := strings.ReplaceAll(domainMedia.Caption, "\n", "<br>")
 
 	if err := index.ExecuteTemplate(w, "instagram-item-element", map[string]any{
 		"Caption": captionWithBreaks,
-		"Items":   items,
+		"Medias":  medias,
 	}); err != nil {
 		logging.ErrorCtx(r.Context(), err)
 	}
 }
 
-func parseURLToDom(link string, isVideo bool) (string, error) {
+func encodeMediaToBase64(link string, isVideo bool) (m media, err error) {
 	bs, err := downloadImage(link)
 	if err != nil {
-		return "", nil
+		return media{}, err
 	}
 
 	base64Str := encodeToBase64(bs)
 
+	mediaType := `data:image/jpeg;base64,%s`
 	if isVideo {
-		return fmt.Sprintf(`data:video/mp4;base64,%s`, base64Str), nil
+		mediaType = `data:video/mp4;base64,%s`
 	}
 
-	return fmt.Sprintf(`data:image/jpeg;base64,%s`, base64Str), nil
+	m.IsVideo = isVideo
+	m.URL = fmt.Sprintf(mediaType, base64Str)
+
+	return
 }
 
 func downloadImage(url string) ([]byte, error) {
