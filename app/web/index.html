@@ -84,11 +84,11 @@
             text-align: center;
         }
         .list-group-item img {
-            max-width: 300px;
+            max-width: 100%;
             height: auto;
         }
         .list-group-item video {
-            max-width: 300px;
+            max-width: 100%;
             height: auto;
         }
         .enlarged {
@@ -112,7 +112,8 @@
 </head>
 <body>
     <div class="form-container">
-        <form hx-post="/parse/" hx-target="#film-list" hx-swap="beforeend" hx-indicator="#spinner">
+        {{/*  <form hx-post="/parse/" hx-target="#film-list" hx-swap="beforeend" hx-indicator="#spinner">  */}}
+        <form hx-post="/parse/" hx-target="#film-list" hx-swap="innerHTML" hx-indicator="#spinner">
             <div class="mb-3">
                 <label for="post-url">Instagram Post/Reels URL</label>
                 <input type="text" name="url" id="post-url" class="form-control" />
