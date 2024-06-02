@@ -96,7 +96,7 @@ func (repo *InstagramFetcherRepo) GetPostWithCode(code string) (domain.Media, er
 	})
 
 	collector.OnRequest(func(r *colly.Request) {
-		r.Headers.Set("User-Agent", browser.Chrome())
+		r.Headers.Set("User-Agent", browser.Random())
 	})
 
 	if err := collector.Visit(URL); err != nil {
