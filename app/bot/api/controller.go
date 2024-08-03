@@ -7,6 +7,7 @@ import (
 	"github.com/omegaatt36/instagramrobot/appmodule/instagram"
 	"github.com/omegaatt36/instagramrobot/appmodule/providers"
 	"github.com/omegaatt36/instagramrobot/appmodule/telegram"
+	"github.com/omegaatt36/instagramrobot/appmodule/threads"
 	"github.com/omegaatt36/instagramrobot/logging"
 
 	"gopkg.in/telebot.v3"
@@ -72,12 +73,13 @@ func (x *Controller) OnText(c telebot.Context) error {
 // Gets list of links from user message text
 // and processes each one of them one by one.
 func (x *Controller) processLinks(links []string, m *telebot.Message) error {
-	for index, link := range links {
-		linkProcessor := providers.NewLinkProcessor(
-			instagram.NewInstagramFetcher(),
-			telegram.NewMediaSender(x.bot, m),
-		)
+	linkProcessor := providers.NewLinkProcessor(providers.NewLinkProcessorRequest{
+		InstagramFetcher: instagram.NewInstagramFetcher(),
+		ThreadsFetcher:   threads.NewExtractor(),
+		Sender:           telegram.NewMediaSender(x.bot, m),
+	})
 
+	for index, link := range links {
 		if index == 3 {
 			logging.Errorf("can't process more than %c links per message", 3)
 			break

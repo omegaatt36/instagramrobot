@@ -66,7 +66,7 @@ func fromEmbedResponse(embed EmbedResponse) domain.Media {
 // GetPostWithCode lets you to get information about specific Instagram post
 // by providing its unique short code
 func (repo *InstagramFetcherRepo) GetPostWithCode(code string) (domain.Media, error) {
-	URL := fmt.Sprintf("https://www.instagram.com/p/%v/embed/captioned/", code)
+	URL := "https://www.threads.net/@beerich168/post/C-LIcYCytrH/embed"
 
 	var embeddedMediaImage string
 	var embedResponse = EmbedResponse{}

@@ -27,7 +27,7 @@ const (
 
 // Send will start to process Media and eventually send it to the Telegram chat
 func (m *MediaSender) Send(media *domain.Media) error {
-	logging.Infof("chatID(%d) short code(%s)", m.msg.Sender.ID, media.ShortCode)
+	logging.Infof("chatID(%d) source(%s) short code(%s)", m.msg.Sender.ID, media.Source, media.ShortCode)
 
 	// Check if media has no child item
 	if len(media.Items) == 0 {

@@ -1,4 +1,13 @@
+//go:generate go-enum -f=$GOFILE
+
 package domain
+
+// Source defines the source of the media.
+// ENUM(
+// Instagram
+// Threads
+// )
+type Source string
 
 // MediaItem contains information about the Instagram post
 // which is similar to the Instagram Media struct
@@ -22,6 +31,7 @@ type Media struct {
 	Url       string      `json:"url"`
 	Items     []MediaItem `json:"items"`
 	TakenAt   int64       `json:"taken_at"` // Timestamp
+	Source    Source      `json:"source"`
 }
 
 // MediaSender defines the contract for sending media to the Telegram chat.
