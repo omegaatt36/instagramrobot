@@ -1,29 +1,17 @@
 # InstagramRobot
 
 <!-- [START badges] -->
-<p>
-  <!-- [GitHub Build Workflow] -->
-  <a href="https://github.com/omegaatt36/instagramrobot/actions/workflows/build.yml"><img src="https://github.com/omegaatt36/instagramrobot/actions/workflows/build.yml/badge.svg" alt="Build status"></a>
-  <!-- [GitHub Lint Workflow] -->
-  <a href="https://github.com/omegaatt36/instagramrobot/actions/workflows/lint.yml"><img src="https://github.com/omegaatt36/instagramrobot/actions/workflows/lint.yml/badge.svg" alt="Build status"></a>
-  <!-- [CodeFactor grade] -->
-  <a href="https://codefactor.io/repository/github/omegaatt36/instagramrobot"><img src="https://www.codefactor.io/repository/github/omegaatt36/instagramrobot/badge" alt="CodeFactor"></a>
-  <!-- [Go report score] -->
-  <a href="https://goreportcard.com/report/github.com/omegaatt36/instagramrobot"><img src="https://goreportcard.com/badge/github.com/omegaatt36/instagramrobot?" alt="Go report" /></a>
-  <!-- [GitHub license] -->
-  <a href="https://github.com/omegaatt36/instagramrobot/blob/main/LICENSE"><img src="https://img.shields.io/github/license/omegaatt36/instagramrobot?color=blue" alt="License" /></a>
-  <!-- [PRs welcome] -->
-  <a href="https://github.com/omegaatt36/instagramrobot/pulls"><img src="https://img.shields.io/badge/PRs-welcome-blue.svg?color=d9ecde" alt="Contributing"></a>
-</p>
+
+[![wakatime](https://wakatime.com/badge/user/61550660-cb83-43cc-9bc5-cf742c36b4cd/project/5ee6b14b-f44a-4330-a9ce-ff24385d9c28.svg)](https://wakatime.com/badge/user/61550660-cb83-43cc-9bc5-cf742c36b4cd/project/5ee6b14b-f44a-4330-a9ce-ff24385d9c28)
+[![Build status](https://github.com/omegaatt36/instagramrobot/actions/workflows/build.yml/badge.svg)](https://github.com/omegaatt36/instagramrobot/actions/workflows/build.yml)
+[![Build status](https://github.com/omegaatt36/instagramrobot/actions/workflows/lint.yml/badge.svg)](https://github.com/omegaatt36/instagramrobot/actions/workflows/lint.yml)
+[![CodeFactor](https://www.codefactor.io/repository/github/omegaatt36/instagramrobot/badge)](https://codefactor.io/repository/github/omegaatt36/instagramrobot)
+[![Go report](https://goreportcard.com/badge/github.com/omegaatt36/instagramrobot)](https://goreportcard.com/report/github.com/omegaatt36/instagramrobot)
+[![License](https://img.shields.io/github/license/omegaatt36/instagramrobot?color=blue)](https://github.com/omegaatt36/instagramrobot/blob/main/LICENSE)
+[![Contributing](https://img.shields.io/badge/PRs-welcome-blue.svg?color=d9ecde)](https://github.com/omegaatt36/instagramrobot/pulls)
 <!-- [END badges] -->
 
 <!-- [START description] -->
-
-<a href="https://github.com/omegaatt36/instagramrobot" >
-  <img align="right" src="https://raw.githubusercontent.com/omegaatt36/instagramrobot/main/images/ig-logo.svg" width="80" />
-  <img align="right" src="https://raw.githubusercontent.com/omegaatt36/instagramrobot/main/images/telegram-logo.svg" width="80" />
-  <img align="right" src="https://raw.githubusercontent.com/omegaatt36/instagramrobot/main/images/golang-logo.svg" height="80" />
-</a>
 
 > [InstagramRobot](https://github.com/omegaatt36/instagramrobot) is a bot based on [Telegram Bot API](https://core.telegram.org/bots/api) written in [Golang](https://golang.org/) that allows users to download public [Instagram](https://www.instagram.com/) photos, videos, and albums, without getting the user's credentials.
 
@@ -31,23 +19,23 @@
 
 ## Table of contents
 
--   [Installing](#installing)
--   [Configuration](#configuration)
--   [Installing via Kubernetes by using helm](#installing-via-kubernetes-by-using-helm)
--   [Installing via Docker](#installing-via-docker)
-    -   [Building the container](#building-the-container)
-    -   [Running the container](#running-the-container)
--   [Installing as a service](#installing-as-a-service)
-    -   [Build the application](#build-the-application)
-    -   [Register the service](#register-the-service)
-    -   [Enable the service at boot](#enable-the-service-at-boot)
-    -   [Start the service](#start-the-service)
+- [Installing](#installing-telegram-bot)
+- [Configuration](#configuration)
+- [Installing via Kubernetes by using helm](#installing-via-kubernetes-by-using-helm)
+- [Installing via Docker](#installing-via-docker)
+  - [Building the container](#building-the-container)
+  - [Running the container](#running-the-container)
+- [Installing as a service](#installing-as-a-service)
+  - [Build the application](#build-the-application)
+  - [Register the service](#register-the-service)
+  - [Enable the service at boot](#enable-the-service-at-boot)
+  - [Start the service](#start-the-service)
 
 ## Installing Telegram Bot
 
 Alternatively, you can download this project by cloning its Git repository:
 
-```
+```bash
 git clone https://github.com/omegaatt36/instagramrobot.git
 ```
 
@@ -87,7 +75,7 @@ docker compose up
 
 ### Installing as a service
 
-Make sure that the project files exists in the `/usr/local/instagramrobot` directory.
+Make sure that the project files exist in the `/usr/local/instagramrobot` directory.
 
 #### Build the application
 
@@ -138,4 +126,4 @@ Powered by [HTMX](https://htmx.org/)
 go run cmd/web/main.go
 ```
 
-then you can open `http://localhost:8080` on your browser.
+Then you can open `http://localhost:8080` on your browser.
