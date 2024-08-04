@@ -33,7 +33,6 @@ func NewExtractor() domain.ThreadsFetcher {
 
 func (repo *Extractor) GetPostWithURL(URL *url.URL) (media domain.Media, err error) {
 	URL.RawQuery = ""
-	fmt.Println(URL.String())
 
 	URL = URL.JoinPath("embed")
 
@@ -43,10 +42,10 @@ func (repo *Extractor) GetPostWithURL(URL *url.URL) (media domain.Media, err err
 	// case single image or video
 	collector.OnHTML("div.SingleInnerMediaContainer", func(e *colly.HTMLElement) {
 		if src := e.ChildAttr("img", "src"); src != "" {
-			media.Url = src
+			media.URL = src
 		}
 		if src := e.ChildAttr("video > source", "src"); src != "" {
-			media.Url = src
+			media.URL = src
 			media.IsVideo = true
 		}
 	})
@@ -55,12 +54,12 @@ func (repo *Extractor) GetPostWithURL(URL *url.URL) (media domain.Media, err err
 	collector.OnHTML("div.MediaScrollImageContainer", func(e *colly.HTMLElement) {
 		if src := e.ChildAttr("img", "src"); src != "" {
 			media.Items = append(media.Items, domain.MediaItem{
-				Url: src,
+				URL: src,
 			})
 		}
 		if src := e.ChildAttr("video > source", "src"); src != "" {
 			media.Items = append(media.Items, domain.MediaItem{
-				Url:     src,
+				URL:     src,
 				IsVideo: true,
 			})
 		}

@@ -16,14 +16,14 @@ import (
 	"github.com/omegaatt36/instagramrobot/domain"
 )
 
-// InstagramFetcherRepo is the repository for fetching Instagram media.
-type InstagramFetcherRepo struct {
+// Extractor is the implement for fetching Instagram media.
+type Extractor struct {
 	client *http.Client
 }
 
 // NewInstagramFetcher will create a new instance of InstagramFetcherRepo.
 func NewInstagramFetcher() domain.InstagramFetcher {
-	return &InstagramFetcherRepo{
+	return &Extractor{
 		client: &http.Client{
 			Timeout: 10 * time.Second,
 			Transport: &http.Transport{
@@ -39,24 +39,16 @@ func NewInstagramFetcher() domain.InstagramFetcher {
 // fromEmbedResponse will automatically transforms the EmbedResponse to the Media
 func fromEmbedResponse(embed EmbedResponse) domain.Media {
 	media := domain.Media{
-		Id:        embed.Media.Id,
 		ShortCode: embed.Media.ShortCode,
-		Type:      embed.Media.Type,
-		Comments:  embed.Media.Comments.Count,
-		Likes:     embed.Media.Likes.Count,
-		Url:       embed.ExtractMediaURL(),
-		TakenAt:   embed.Media.TakenAt.Unix(),
+		URL:       embed.ExtractMediaURL(),
 		IsVideo:   embed.IsVideo(),
 		Caption:   embed.GetCaption(),
 	}
 
 	for _, item := range embed.Media.SliderItems.Edges {
 		media.Items = append(media.Items, domain.MediaItem{
-			Id:        item.Node.Id,
-			ShortCode: item.Node.ShortCode,
-			Type:      item.Node.Type,
-			IsVideo:   item.Node.IsVideo,
-			Url:       item.Node.ExtractMediaURL(),
+			IsVideo: item.Node.IsVideo,
+			URL:     item.Node.ExtractMediaURL(),
 		})
 	}
 
@@ -65,7 +57,7 @@ func fromEmbedResponse(embed EmbedResponse) domain.Media {
 
 // GetPostWithCode lets you to get information about specific Instagram post
 // by providing its unique short code
-func (repo *InstagramFetcherRepo) GetPostWithCode(code string) (domain.Media, error) {
+func (repo *Extractor) GetPostWithCode(code string) (domain.Media, error) {
 	URL := "https://www.threads.net/@beerich168/post/C-LIcYCytrH/embed"
 
 	var embeddedMediaImage string
@@ -111,7 +103,7 @@ func (repo *InstagramFetcherRepo) GetPostWithCode(code string) (domain.Media, er
 
 	if embeddedMediaImage != "" {
 		return domain.Media{
-			Url: embeddedMediaImage,
+			URL: embeddedMediaImage,
 		}, nil
 	}
 

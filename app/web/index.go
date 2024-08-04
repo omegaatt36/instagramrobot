@@ -64,7 +64,7 @@ func (s *Server) addFilm(w http.ResponseWriter, r *http.Request) {
 	medias := make([]media, 0)
 	// Check if media has no child item
 	if len(domainMedia.Items) == 0 {
-		m, err := encodeMediaToBase64(domainMedia.Url, domainMedia.IsVideo)
+		m, err := encodeMediaToBase64(domainMedia.URL, domainMedia.IsVideo)
 		if err != nil {
 			logging.ErrorCtx(r.Context(), err)
 			http.Error(w, err.Error(), http.StatusInternalServerError)
@@ -73,7 +73,7 @@ func (s *Server) addFilm(w http.ResponseWriter, r *http.Request) {
 		medias = append(medias, m)
 	} else {
 		for _, item := range domainMedia.Items {
-			m, err := encodeMediaToBase64(item.Url, item.IsVideo)
+			m, err := encodeMediaToBase64(item.URL, item.IsVideo)
 			if err != nil {
 				logging.ErrorCtx(r.Context(), err)
 				http.Error(w, err.Error(), http.StatusInternalServerError)

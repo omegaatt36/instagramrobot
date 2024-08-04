@@ -40,7 +40,7 @@ func (m *MediaSender) Send(media *domain.Media) error {
 func (m *MediaSender) sendSingleMedia(media *domain.Media) error {
 	if media.IsVideo {
 		if _, err := m.bot.Send(m.msg.Chat, &telebot.Video{
-			File:    telebot.FromURL(media.Url),
+			File:    telebot.FromURL(media.URL),
 			Caption: caption,
 		}); err != nil {
 			return fmt.Errorf("couldn't send the single video, %w", err)
@@ -49,7 +49,7 @@ func (m *MediaSender) sendSingleMedia(media *domain.Media) error {
 		logging.Debugf("Sent single video with short code [%v]", media.ShortCode)
 	} else {
 		if _, err := m.bot.Send(m.msg.Chat, &telebot.Photo{
-			File:    telebot.FromURL(media.Url),
+			File:    telebot.FromURL(media.URL),
 			Caption: caption,
 		}); err != nil {
 			return fmt.Errorf("couldn't send the single photo, %w", err)
@@ -75,11 +75,11 @@ func (m *MediaSender) generateAlbumFromMedia(media *domain.Media) telebot.Album 
 	for _, media := range media.Items {
 		if media.IsVideo {
 			album = append(album, &telebot.Video{
-				File: telebot.FromURL(media.Url),
+				File: telebot.FromURL(media.URL),
 			})
 		} else {
 			album = append(album, &telebot.Photo{
-				File: telebot.FromURL(media.Url),
+				File: telebot.FromURL(media.URL),
 			})
 		}
 	}
