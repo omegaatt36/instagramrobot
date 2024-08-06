@@ -1,0 +1,9 @@
+version: "3.8"
+
+services:
+  bot:
+    restart: always
+    image: omegaatt36/insta-fetcher:latest
+    environment:
+      - APP_ENV=production
+      - BOT_TOKEN=FILL_ME

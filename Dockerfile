@@ -24,7 +24,7 @@ ENV GOPROXY=https://proxy.golang.org
 ENV APP_NAME=insta-fetcher
 
 # Build binary file
-RUN ["go", "build", "-o", "build/${APP_NAME}"]
+RUN ["go", "build", "-o", "build/${APP_NAME}", "cmd/bot/main.go"]
 
 #
 # Development build

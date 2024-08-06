@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"github.com/gocolly/colly/v2"
+
 	"github.com/omegaatt36/instagramrobot/domain"
 )
 

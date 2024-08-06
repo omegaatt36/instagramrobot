@@ -3,9 +3,10 @@ package telegram
 import (
 	"fmt"
 
+	"gopkg.in/telebot.v3"
+
 	"github.com/omegaatt36/instagramrobot/domain"
 	"github.com/omegaatt36/instagramrobot/logging"
-	"gopkg.in/telebot.v3"
 )
 
 type MediaSender struct {

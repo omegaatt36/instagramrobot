@@ -48,7 +48,7 @@ go run main.go --bot-token=***** --app-env=development
 ### Installing via Kubernetes by using helm
 
 ```shell
-pushd charts
+pushd deploy/charts/bot
 helm upgrade --install -v values.yaml insta-fetcher .
 popd
 ```
@@ -70,7 +70,7 @@ docker compose build
 #### Running the container
 
 ```sh
-docker compose up
+docker compose up -f deploy/docker-compose.yml
 ```
 
 ### Installing as a service
@@ -82,7 +82,7 @@ Make sure that the project files exist in the `/usr/local/instagramrobot` direct
 > If you don't have Go installed, [click here](https://golang.org/doc/install) and follow its instructions.
 
 ```sh
-go build -o bin/insta-fetcher
+go build cmd/bot/main.go -o bin/insta-fetcher
 ```
 
 #### Register the service

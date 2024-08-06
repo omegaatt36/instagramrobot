@@ -9,9 +9,9 @@ import (
 	"runtime/debug"
 	"syscall"
 
-	"github.com/omegaatt36/instagramrobot/cliflag"
-
 	"github.com/urfave/cli/v2"
+
+	"github.com/omegaatt36/instagramrobot/cliflag"
 )
 
 // App is cli wrapper that do some common operation and creates signal handler.

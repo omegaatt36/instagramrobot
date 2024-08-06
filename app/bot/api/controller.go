@@ -4,13 +4,13 @@ import (
 	"fmt"
 	"regexp"
 
+	"gopkg.in/telebot.v3"
+
 	"github.com/omegaatt36/instagramrobot/appmodule/instagram"
 	"github.com/omegaatt36/instagramrobot/appmodule/providers"
 	"github.com/omegaatt36/instagramrobot/appmodule/telegram"
 	"github.com/omegaatt36/instagramrobot/appmodule/threads"
 	"github.com/omegaatt36/instagramrobot/logging"
-
-	"gopkg.in/telebot.v3"
 )
 
 // Controller is the main controller for the bot.

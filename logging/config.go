@@ -2,10 +2,10 @@
 package logging
 
 import (
-	"github.com/omegaatt36/instagramrobot/cliflag"
-
 	"github.com/urfave/cli/v2"
 	"go.uber.org/zap"
+
+	"github.com/omegaatt36/instagramrobot/cliflag"
 )
 
 type cfg struct {

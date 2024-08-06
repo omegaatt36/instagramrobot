@@ -8,8 +8,9 @@ import (
 	"sync"
 	"time"
 
-	"github.com/omegaatt36/instagramrobot/logging"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
+
+	"github.com/omegaatt36/instagramrobot/logging"
 )
 
 const (

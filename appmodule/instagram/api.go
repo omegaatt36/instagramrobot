@@ -13,6 +13,7 @@ import (
 
 	browser "github.com/EDDYCJY/fake-useragent"
 	"github.com/gocolly/colly/v2"
+
 	"github.com/omegaatt36/instagramrobot/domain"
 )
 
@@ -58,7 +59,7 @@ func fromEmbedResponse(embed EmbedResponse) domain.Media {
 // GetPostWithCode lets you to get information about specific Instagram post
 // by providing its unique short code
 func (repo *Extractor) GetPostWithCode(code string) (domain.Media, error) {
-	URL := "https://www.threads.net/@beerich168/post/C-LIcYCytrH/embed"
+	URL := fmt.Sprintf("https://www.instagram.com/p/%v/embed/captioned/", code)
 
 	var embeddedMediaImage string
 	var embedResponse = EmbedResponse{}

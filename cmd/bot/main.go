@@ -3,12 +3,13 @@ package main
 import (
 	"context"
 
+	"github.com/urfave/cli/v2"
+
 	"github.com/omegaatt36/instagramrobot/app"
 	"github.com/omegaatt36/instagramrobot/app/bot"
 	"github.com/omegaatt36/instagramrobot/app/bot/config"
 	"github.com/omegaatt36/instagramrobot/health"
 	"github.com/omegaatt36/instagramrobot/logging"
-	"github.com/urfave/cli/v2"
 )
 
 // Main is the entry point of the application.

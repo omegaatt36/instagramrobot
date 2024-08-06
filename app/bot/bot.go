@@ -4,10 +4,11 @@ import (
 	"context"
 	"time"
 
+	"gopkg.in/telebot.v3"
+
 	"github.com/omegaatt36/instagramrobot/app/bot/api"
 	"github.com/omegaatt36/instagramrobot/app/bot/config"
 	"github.com/omegaatt36/instagramrobot/logging"
-	"gopkg.in/telebot.v3"
 )
 
 var b *telebot.Bot
