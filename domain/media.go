@@ -21,7 +21,7 @@ type Media struct {
 	Caption   string
 	IsVideo   bool
 	URL       string
-	Items     []MediaItem
+	Items     []*MediaItem
 	Source    Source
 }
 

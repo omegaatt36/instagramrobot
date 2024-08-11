@@ -22,70 +22,55 @@ func NewMediaSender(bot *telebot.Bot, msg *telebot.Message) domain.MediaSender {
 	}
 }
 
-const (
-	caption = "🤖 Downloaded via @InstagramKeeperBot"
-)
-
 // Send will start to process Media and eventually send it to the Telegram chat
 func (m *MediaSender) Send(media *domain.Media) error {
 	logging.Infof("chatID(%d) source(%s) short code(%s)", m.msg.Sender.ID, media.Source, media.ShortCode)
 
+	var fnSend func(*domain.Media) error
+
 	// Check if media has no child item
 	if len(media.Items) == 0 {
-		return m.sendSingleMedia(media)
+		fnSend = m.sendSingleMedia
+	} else {
+		fnSend = m.sendNestedMedia
 	}
 
-	return m.sendNestedMedia(media)
+	if err := fnSend(media); err != nil {
+		return fmt.Errorf("sent the media failed, %w", err)
+	}
+
+	return m.SendCaption(media)
 }
 
 func (m *MediaSender) sendSingleMedia(media *domain.Media) error {
-	if media.IsVideo {
-		if _, err := m.bot.Send(m.msg.Chat, &telebot.Video{
-			File:    telebot.FromURL(media.URL),
-			Caption: caption,
-		}); err != nil {
-			return fmt.Errorf("couldn't send the single video, %w", err)
-		}
-
-		logging.Debugf("Sent single video with short code [%v]", media.ShortCode)
-	} else {
-		if _, err := m.bot.Send(m.msg.Chat, &telebot.Photo{
-			File:    telebot.FromURL(media.URL),
-			Caption: caption,
-		}); err != nil {
-			return fmt.Errorf("couldn't send the single photo, %w", err)
-		}
-
-		logging.Debugf("Sent single photo with short code [%v]", media.ShortCode)
+	if media.URL == "" {
+		return nil
 	}
 
-	return m.SendCaption(media)
+	mediaToSend := convertMediaToInputtable(media)
+
+	if _, err := m.bot.Send(m.msg.Chat, mediaToSend); err != nil {
+		return fmt.Errorf("couldn't send the %s photo, %w", mediaToSend.MediaType(), err)
+	}
+
+	logging.Debugf("Sent single %s with short code [%v]", mediaToSend.MediaType(), media.ShortCode)
+
+	return nil
 }
 
 func (m *MediaSender) sendNestedMedia(media *domain.Media) error {
-	_, err := m.bot.SendAlbum(m.msg.Chat, m.generateAlbumFromMedia(media))
-	if err != nil {
-		return fmt.Errorf("couldn't send the nested media, %w", err)
-	}
-	return m.SendCaption(media)
-}
-
-func (m *MediaSender) generateAlbumFromMedia(media *domain.Media) telebot.Album {
 	var album telebot.Album
 
 	for _, media := range media.Items {
-		if media.IsVideo {
-			album = append(album, &telebot.Video{
-				File: telebot.FromURL(media.URL),
-			})
-		} else {
-			album = append(album, &telebot.Photo{
-				File: telebot.FromURL(media.URL),
-			})
-		}
+		album = append(album, convertMediaItemToInputtable(media))
 	}
 
-	return album
+	_, err := m.bot.SendAlbum(m.msg.Chat, album)
+	if err != nil {
+		return fmt.Errorf("couldn't send the nested media, %w", err)
+	}
+
+	return nil
 }
 
 // SendCaption will send the caption to the chat.
@@ -94,7 +79,12 @@ func (m *MediaSender) SendCaption(media *domain.Media) error {
 	if media.Caption == "" {
 		return nil
 	}
-	// TODO: chunk caption if the length is above the Telegram limit
+
+	// shrink media caption below 4096 characters
+	if len(media.Caption) > 4096 {
+		media.Caption = media.Caption[:4096]
+	}
+
 	_, err := m.bot.Reply(m.msg, media.Caption)
 	return err
 }
