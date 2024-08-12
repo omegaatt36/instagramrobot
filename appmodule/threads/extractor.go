@@ -54,12 +54,12 @@ func (repo *Extractor) GetPostWithURL(URL *url.URL) (media domain.Media, err err
 	// case multiple image or video
 	collector.OnHTML("div.MediaScrollImageContainer", func(e *colly.HTMLElement) {
 		if src := e.ChildAttr("img", "src"); src != "" {
-			media.Items = append(media.Items, domain.MediaItem{
+			media.Items = append(media.Items, &domain.MediaItem{
 				URL: src,
 			})
 		}
 		if src := e.ChildAttr("video > source", "src"); src != "" {
-			media.Items = append(media.Items, domain.MediaItem{
+			media.Items = append(media.Items, &domain.MediaItem{
 				URL:     src,
 				IsVideo: true,
 			})

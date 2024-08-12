@@ -47,7 +47,7 @@ func fromEmbedResponse(embed EmbedResponse) domain.Media {
 	}
 
 	for _, item := range embed.Media.SliderItems.Edges {
-		media.Items = append(media.Items, domain.MediaItem{
+		media.Items = append(media.Items, &domain.MediaItem{
 			IsVideo: item.Node.IsVideo,
 			URL:     item.Node.ExtractMediaURL(),
 		})
@@ -61,13 +61,13 @@ func fromEmbedResponse(embed EmbedResponse) domain.Media {
 func (repo *Extractor) GetPostWithCode(code string) (domain.Media, error) {
 	URL := fmt.Sprintf("https://www.instagram.com/p/%v/embed/captioned/", code)
 
-	var embeddedMediaImage string
+	var coverPhoto string
 	var embedResponse = EmbedResponse{}
 	collector := colly.NewCollector()
 	collector.SetClient(repo.client)
 
 	collector.OnHTML("img.EmbeddedMediaImage", func(e *colly.HTMLElement) {
-		embeddedMediaImage = e.Attr("src")
+		coverPhoto = e.Attr("src")
 	})
 
 	collector.OnHTML("script", func(e *colly.HTMLElement) {
@@ -102,13 +102,14 @@ func (repo *Extractor) GetPostWithCode(code string) (domain.Media, error) {
 		return fromEmbedResponse(embedResponse), nil
 	}
 
-	if embeddedMediaImage != "" {
+	if coverPhoto != "" {
 		return domain.Media{
-			URL: embeddedMediaImage,
+			URL:     coverPhoto,
+			Caption: "can only fetch the cover photo",
 		}, nil
 	}
 
-	// If every two methods have failed, then return an error
+	// if every two methods have failed, then return an error
 	return domain.Media{}, errors.New("failed to fetch the post\nthe page might be \"private\", or\nthe link is completely wrong")
 }
 

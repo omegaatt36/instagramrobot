@@ -95,7 +95,7 @@ type SliderItems struct {
 
 // Media which contains a single Instagram post
 type Media struct {
-	Id               string     `json:"id"`                    // Unique ID of the Media
+	ID               string     `json:"id"`                    // Unique ID of the Media
 	ShortCode        string     `json:"shortcode"`             // Unique shortcode of the Media
 	Type             string     `json:"__typename"`            // Type of the Media
 	ProductType      string     `json:"product_type"`          // Product type of the Media
@@ -125,7 +125,7 @@ type EmbedResponse struct {
 
 // IsEmpty will return true if the Media object is empty
 func (s EmbedResponse) IsEmpty() bool {
-	return s.Media.Id == ""
+	return s.Media.ID == ""
 }
 
 // IsVideo will return true if the Media type is equals to video
