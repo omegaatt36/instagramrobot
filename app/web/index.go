@@ -86,7 +86,7 @@ func (s *Server) addFilm(w http.ResponseWriter, r *http.Request) {
 
 	captionWithBreaks := strings.ReplaceAll(domainMedia.Caption, "\n", "<br>")
 
-	if err := index.ExecuteTemplate(w, "instagram-item-element", map[string]any{
+	if err := index.ExecuteTemplate(w, "medias", map[string]any{
 		"Caption": captionWithBreaks,
 		"Medias":  medias,
 	}); err != nil {
