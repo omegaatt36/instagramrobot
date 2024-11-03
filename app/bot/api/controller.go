@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"regexp"
 
-	"gopkg.in/telebot.v3"
+	"gopkg.in/telebot.v4"
 
 	"github.com/omegaatt36/instagramrobot/appmodule/instagram"
 	"github.com/omegaatt36/instagramrobot/appmodule/providers"

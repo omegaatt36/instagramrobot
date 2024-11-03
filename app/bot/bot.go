@@ -4,7 +4,7 @@ import (
 	"context"
 	"time"
 
-	"gopkg.in/telebot.v3"
+	"gopkg.in/telebot.v4"
 
 	"github.com/omegaatt36/instagramrobot/app/bot/api"
 	"github.com/omegaatt36/instagramrobot/app/bot/config"

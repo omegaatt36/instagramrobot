@@ -2,7 +2,7 @@ package telegram
 
 import (
 	"github.com/omegaatt36/instagramrobot/domain"
-	"gopkg.in/telebot.v3"
+	"gopkg.in/telebot.v4"
 )
 
 func convertMediaToInputtable(media *domain.Media) telebot.Inputtable {

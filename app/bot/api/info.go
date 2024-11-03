@@ -3,7 +3,7 @@ package api
 import (
 	"fmt"
 
-	"gopkg.in/telebot.v3"
+	"gopkg.in/telebot.v4"
 )
 
 // HandlerStart is the entry point for the incoming update

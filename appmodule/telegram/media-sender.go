@@ -3,7 +3,7 @@ package telegram
 import (
 	"fmt"
 
-	"gopkg.in/telebot.v3"
+	"gopkg.in/telebot.v4"
 
 	"github.com/omegaatt36/instagramrobot/domain"
 	"github.com/omegaatt36/instagramrobot/logging"
