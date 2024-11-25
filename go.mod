@@ -8,7 +8,7 @@ require (
 	github.com/EDDYCJY/fake-useragent v0.2.0
 	github.com/gocolly/colly/v2 v2.1.0
 	github.com/prometheus/client_golang v1.20.5
-	github.com/stretchr/testify v1.9.0
+	github.com/stretchr/testify v1.10.0
 	github.com/urfave/cli/v2 v2.27.5
 	go.uber.org/zap v1.27.0
 	gopkg.in/telebot.v4 v4.0.0-beta.4
