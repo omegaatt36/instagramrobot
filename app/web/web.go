@@ -4,34 +4,43 @@ import (
 	"context"
 	"fmt"
 	"net/http"
+	"text/template"
 
 	"github.com/omegaatt36/instagramrobot/logging"
 )
 
 // Server is the main controller for the bot.
 type Server struct {
-	port int
+	port      int
+	indexPage *template.Template
 }
 
 func NewServer() *Server {
+	index, err := template.ParseFS(indexHTML, "index.html")
+	if err != nil {
+		panic(err)
+	}
 	return &Server{
-		port: 8080,
+		port:      8080,
+		indexPage: index,
 	}
 }
 
 func (s *Server) startHttp(ctx context.Context) {
 	mux := http.NewServeMux()
 	mux.HandleFunc("/", s.index)
-	mux.HandleFunc("/parse/", s.addFilm)
+	mux.HandleFunc("/parse/", s.parse)
 
 	srv := &http.Server{
 		Addr:    fmt.Sprintf(":%d", s.port),
 		Handler: mux,
 	}
 
-	if err := srv.ListenAndServe(); err != nil {
-		logging.Fatalf("listen: %s\n", err)
-	}
+	go func() {
+		if err := srv.ListenAndServe(); err != nil && err != http.ErrServerClosed {
+			logging.Fatalf("listen: %s\n", err)
+		}
+	}()
 
 	go func() {
 		<-ctx.Done()

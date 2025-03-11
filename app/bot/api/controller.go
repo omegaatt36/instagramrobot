@@ -1,6 +1,7 @@
 package api
 
 import (
+	"errors"
 	"fmt"
 	"regexp"
 
@@ -15,12 +16,15 @@ import (
 
 // Controller is the main controller for the bot.
 type Controller struct {
-	bot *telebot.Bot // Bot instance
+	bot       *telebot.Bot // Bot instance
+	urlParser *regexp.Regexp
 }
 
 // NewController creates a new Controller instance.
 func NewController(b *telebot.Bot) *Controller {
-	return &Controller{bot: b}
+	regex := `(http|ftp|https)://([\w_-]+(?:(?:\.[\w_-]+)+))([\w.,@@?^=%&:/~+#-]*[\w@?^=%&/~+#-])?`
+	r := regexp.MustCompile(regex)
+	return &Controller{bot: b, urlParser: r}
 }
 
 // OnStart is the entry point for the incoming update
@@ -37,16 +41,12 @@ func (*Controller) OnStart(c telebot.Context) error {
 	return nil
 }
 
-// extractLinksFromString lets you to extract HTTP links from a string
-func extractLinksFromString(input string) []string {
-	regex := `(http|ftp|https)://([\w_-]+(?:(?:\.[\w_-]+)+))([\w.,@?^=%&:/~+#-]*[\w@?^=%&/~+#-])?`
-	r := regexp.MustCompile(regex)
-	return r.FindAllString(input, -1)
+func (x *Controller) extractLinksFromString(input string) []string {
+	return x.urlParser.FindAllString(input, -1)
 }
 
-// Handler is the entry point for the incoming update
 func (x *Controller) OnText(c telebot.Context) error {
-	links := extractLinksFromString(c.Message().Text)
+	links := x.extractLinksFromString(c.Message().Text)
 
 	// Send proper error if text has no link inside
 	if len(links) == 0 {
@@ -54,7 +54,8 @@ func (x *Controller) OnText(c telebot.Context) error {
 			return nil
 		}
 
-		logging.Error("Invalid command,\nPlease send the Instagram post link.")
+		err := errors.New("Invalid command,\nPlease send the Instagram post link.")
+		logging.Error(fmt.Errorf("OnText.replyError: %w", err))
 		return x.replyError(c, "Invalid command,\nPlease send the Instagram post link.")
 	}
 
@@ -63,7 +64,7 @@ func (x *Controller) OnText(c telebot.Context) error {
 			return nil
 		}
 
-		logging.Error(err)
+		logging.Error(fmt.Errorf("OnText.processLinks: %w", err))
 		return x.replyError(c, err.Error())
 	}
 
@@ -73,6 +74,8 @@ func (x *Controller) OnText(c telebot.Context) error {
 // Gets list of links from user message text
 // and processes each one of them one by one.
 func (x *Controller) processLinks(links []string, m *telebot.Message) error {
+	const maxLinksPerMessage = 3
+
 	linkProcessor := providers.NewLinkProcessor(providers.NewLinkProcessorRequest{
 		InstagramFetcher: instagram.NewInstagramFetcher(),
 		ThreadsFetcher:   threads.NewExtractor(),
@@ -80,21 +83,20 @@ func (x *Controller) processLinks(links []string, m *telebot.Message) error {
 	})
 
 	for index, link := range links {
-		if index == 3 {
-			logging.Errorf("can't process more than %c links per message", 3)
+		if index == maxLinksPerMessage {
+			logging.Errorf("can't process more than %c links per message", maxLinksPerMessage)
 			break
 		}
 
 		if err := linkProcessor.ProcessLink(link); err != nil {
-			return err
+			logging.Error(fmt.Errorf("processLinks.ProcessLink: %w", err))
+			continue // 繼續處理下一個 link
 		}
 	}
 
 	return nil
 }
 
-// replyError will sends the error to specific Telegram chat
-// with a pre-defined structure
 func (*Controller) replyError(c telebot.Context, text string) error {
 	_, err := c.Bot().Reply(c.Message(), fmt.Sprintf("⚠️ *Oops, ERROR!*\n\n`%v`", text), telebot.ModeMarkdown)
 	if err != nil {
@@ -102,5 +104,4 @@ func (*Controller) replyError(c telebot.Context, text string) error {
 	}
 
 	return nil
-
 }

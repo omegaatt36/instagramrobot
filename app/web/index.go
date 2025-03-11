@@ -7,7 +7,6 @@ import (
 	"io"
 	"net/http"
 	"strings"
-	"text/template"
 
 	"github.com/omegaatt36/instagramrobot/appmodule/instagram"
 	"github.com/omegaatt36/instagramrobot/logging"
@@ -25,27 +24,14 @@ type media struct {
 
 // handler function #1 - returns the index.html template, with film data
 func (s *Server) index(w http.ResponseWriter, r *http.Request) {
-	index, err := template.ParseFS(indexHTML, "index.html")
-	if err != nil {
-		logging.ErrorCtx(r.Context(), err)
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
-
-	if err := index.Execute(w, nil); err != nil {
+	if err := s.indexPage.Execute(w, nil); err != nil {
 		logging.ErrorCtx(r.Context(), err)
 	}
 }
 
 // handler function #2 - returns the template block with the newly added film, as an HTMX response
-func (s *Server) addFilm(w http.ResponseWriter, r *http.Request) {
+func (s *Server) parse(w http.ResponseWriter, r *http.Request) {
 	url := r.PostFormValue("url")
-	index, err := template.ParseFS(indexHTML, "index.html")
-	if err != nil {
-		logging.ErrorCtx(r.Context(), err)
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
 
 	shortCode, err := instagram.ExtractShortCodeFromLink(url)
 	if err != nil {
@@ -86,7 +72,7 @@ func (s *Server) addFilm(w http.ResponseWriter, r *http.Request) {
 
 	captionWithBreaks := strings.ReplaceAll(domainMedia.Caption, "\n", "<br>")
 
-	if err := index.ExecuteTemplate(w, "medias", map[string]any{
+	if err := s.indexPage.ExecuteTemplate(w, "medias", map[string]any{
 		"Caption": captionWithBreaks,
 		"Medias":  medias,
 	}); err != nil {
