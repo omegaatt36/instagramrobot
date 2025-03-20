@@ -1,4 +1,4 @@
-FROM golang:1.24-alpine as build
+FROM golang:1.24-bookworm as build
 
 WORKDIR /go/src/app
 
@@ -8,13 +8,9 @@ RUN ["go", "mod", "download"]
 
 COPY . .
 
-ENV CGO_ENABLED=0
-
 ENV GOPROXY=https://proxy.golang.org
 
-ENV APP_NAME=insta-fetcher
-
-RUN ["go", "build", "-o", "build/${APP_NAME}", "cmd/bot/main.go"]
+RUN ["go", "build", "-o", "insta-fetcher", "cmd/bot/main.go"]
 
 FROM build as dev
 
@@ -24,6 +20,6 @@ FROM gcr.io/distroless/static-debian12 as prod
 
 WORKDIR /home/app/
 
-COPY --from=build /go/src/app/build/${APP_NAME} ./
+COPY --from=build /go/src/app/insta-fetcher ./
 
-CMD ["./${APP_NAME}"]
+CMD ["./insta-fetcher"]

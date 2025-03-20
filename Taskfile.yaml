@@ -1,6 +1,11 @@
 version: "3"
 
 tasks:
+  docker:
+    cmds:
+      - |
+        docker buildx build --platform linux/amd64,linux/arm64 \
+        -t omegaatt36/insta-fetcher:latest . --push
   default:
     cmds:
       - task: dependency
