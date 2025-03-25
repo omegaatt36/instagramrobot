@@ -1,7 +1,16 @@
 name: Docker Build and Push
 
 on:
+  release:
+    types: [published]
   workflow_dispatch:
+    inputs:
+      branch:
+        description: "Branch to release"
+        required: true
+      tag:
+        description: "Tag to release"
+        required: true
 
 jobs:
   build-and-push:
@@ -9,6 +18,8 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event_name == 'release' && github.ref_name || github.event_name == 'workflow_dispatch' && github.event.inputs.branch || github.head_ref }}
 
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v3
@@ -28,5 +39,7 @@ jobs:
           push: true
           file: Dockerfile
           platforms: linux/amd64,linux/arm64
-          tags: omegaatt36/insta-fetcher:latest
+          tags: |
+            omegaatt36/insta-fetcher:latest
+            omegaatt36/insta-fetcher:${{ github.event_name == 'release' && github.ref_name || github.event_name == 'workflow_dispatch' && github.event.inputs.tag }}
           context: .
