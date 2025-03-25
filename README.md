@@ -3,7 +3,7 @@
 <!-- [START badges] -->
 
 [![wakatime](https://wakatime.com/badge/user/61550660-cb83-43cc-9bc5-cf742c36b4cd/project/5ee6b14b-f44a-4330-a9ce-ff24385d9c28.svg)](https://wakatime.com/badge/user/61550660-cb83-43cc-9bc5-cf742c36b4cd/project/5ee6b14b-f44a-4330-a9ce-ff24385d9c28)
-[![Build status](https://github.com/omegaatt36/instagramrobot/actions/workflows/build.yml/badge.svg)](https://github.com/omegaatt36/instagramrobot/actions/workflows/build.yml)
+[![Docker Build and Push](https://github.com/omegaatt36/instagramrobot/actions/workflows/release.yml/badge.svg)](https://github.com/omegaatt36/instagramrobot/actions/workflows/release.yml)
 [![Build status](https://github.com/omegaatt36/instagramrobot/actions/workflows/lint.yml/badge.svg)](https://github.com/omegaatt36/instagramrobot/actions/workflows/lint.yml)
 [![CodeFactor](https://www.codefactor.io/repository/github/omegaatt36/instagramrobot/badge)](https://codefactor.io/repository/github/omegaatt36/instagramrobot)
 [![Go report](https://goreportcard.com/badge/github.com/omegaatt36/instagramrobot)](https://goreportcard.com/report/github.com/omegaatt36/instagramrobot)
