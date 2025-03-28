@@ -14,12 +14,17 @@ import (
 	"github.com/omegaatt36/instagramrobot/cliflag"
 )
 
-// App is cli wrapper that do some common operation and creates signal handler.
+// App provides a wrapper around urfave/cli app setup, including
+// signal handling for graceful shutdown, panic recovery, and flag registration hooks.
 type App struct {
+	// Flags holds common CLI flags for the application.
 	Flags []cli.Flag
-	Main  func(ctx context.Context)
+	// Main is the core function of the application, executed after setup.
+	Main func(ctx context.Context)
 }
 
+// before is executed by cli before the main Action. It initializes registered
+// cliflag packages and includes basic panic recovery for the initialization phase.
 func (a *App) before(c *cli.Context) (err error) {
 	// Panic handling.
 	defer func() {
@@ -36,10 +41,15 @@ func (a *App) before(c *cli.Context) (err error) {
 	return cliflag.Initialize(c)
 }
 
+// after is executed by cli after the main Action. It finalizes registered
+// cliflag packages (usually for cleanup).
 func (a *App) after(c *cli.Context) error {
 	return cliflag.Finalize(c)
 }
 
+// wrapMain wraps the execution of the application's Main function.
+// It sets up a context cancellable by OS signals (SIGINT, SIGTERM)
+// and includes panic recovery for the main application logic.
 func (a *App) wrapMain(c *cli.Context) error {
 	ctx, cancel := context.WithCancel(context.Background())
 	sigs := make(chan os.Signal, 1)
@@ -64,7 +74,9 @@ func (a *App) wrapMain(c *cli.Context) error {
 	return nil
 }
 
-// Run setups everything and runs Main.
+// Run sets up the urfave/cli App with the configured flags, before/after hooks,
+// and the main action wrapper, then executes it. It fatally logs any error
+// during the cli app execution.
 func (a *App) Run() {
 
 	app := cli.NewApp()

@@ -6,6 +6,7 @@ import (
 	"github.com/urfave/cli/v2"
 
 	"github.com/omegaatt36/instagramrobot/app"
+	"github.com/omegaatt36/instagramrobot/app/bot/config"
 	"github.com/omegaatt36/instagramrobot/app/web"
 	"github.com/omegaatt36/instagramrobot/health"
 	"github.com/omegaatt36/instagramrobot/logging"
@@ -13,10 +14,11 @@ import (
 
 // Main is the entry point of the application.
 func Main(ctx context.Context) {
-	logging.Init(false)
+	logging.Init(!config.IsLocal())
 
 	go health.StartServer()
 
+	// Wait for the web server to stop and for the context cancellation signal.
 	stopped := web.NewServer().Start(ctx)
 
 	<-stopped

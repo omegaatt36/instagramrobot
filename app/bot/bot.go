@@ -11,10 +11,14 @@ import (
 	"github.com/omegaatt36/instagramrobot/logging"
 )
 
+// b holds the global bot instance. Consider dependency injection for better testability.
 var b *telebot.Bot
 
 // Register will generate a fresh Telegram bot instance
 // and registers it's handler logics
+// Register creates and configures the global Telegram bot instance `b`.
+// It sets up polling options and logging verbosity based on the environment.
+// It fatally logs errors during bot initialization.
 func Register(botToken string) error {
 	bot, err := telebot.NewBot(telebot.Settings{
 		Token:   botToken,
@@ -38,6 +42,7 @@ func Register(botToken string) error {
 	return nil
 }
 
+// registerCommands sets up the handlers for different Telegram events (commands, text messages).
 func registerCommands() {
 	x := api.NewController(b)
 
@@ -46,6 +51,9 @@ func registerCommands() {
 }
 
 // Start brings bot into motion by consuming incoming updates
+// Start initiates the bot's polling process in a separate goroutine.
+// It returns a channel that will be closed when the bot stops.
+// It listens to the provided context for cancellation signals to gracefully stop the bot.
 func Start(ctx context.Context) <-chan struct{} {
 	logging.Info("Telegram bot starting")
 	closeChain := make(chan struct{})

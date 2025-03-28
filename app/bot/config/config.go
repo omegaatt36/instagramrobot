@@ -8,7 +8,7 @@ import (
 	"github.com/omegaatt36/instagramrobot/cliflag"
 )
 
-// Env represents the environment of the application.
+// Env defines the possible application environments (e.g., local, production).
 // ENUM(
 // local
 // development
@@ -16,9 +16,12 @@ import (
 // )
 type Env string
 
+// config holds the application configuration values, typically populated from flags or env vars.
 type config struct {
+	// appEnvironment stores the current application environment (e.g., "local", "production").
 	appEnvironment string
-	botToken       string
+	// botToken stores the Telegram Bot API token.
+	botToken string
 }
 
 var defaultConfig config
@@ -27,7 +30,8 @@ func init() {
 	cliflag.Register(&defaultConfig)
 }
 
-// CliFlags returns cli flags to setup cache package.
+// CliFlags returns the command-line flags associated with this configuration structure.
+// These flags allow setting configuration values via command-line arguments or environment variables.
 func (cfg *config) CliFlags() []cli.Flag {
 	var flags []cli.Flag
 

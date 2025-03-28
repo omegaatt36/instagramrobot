@@ -12,12 +12,13 @@ import (
 	"github.com/omegaatt36/instagramrobot/domain"
 )
 
-// InstagramFetcherRepo is the repository for fetching Instagram media.
+// Extractor implements the domain.ThreadsFetcher interface.
 type Extractor struct {
+	// client is the HTTP client used for making requests.
 	client *http.Client
 }
 
-// NewExtractor will create a new instance of InstagramFetcherRepo.
+// NewExtractor creates a new instance of Extractor with a configured HTTP client.
 func NewExtractor() domain.ThreadsFetcher {
 	return &Extractor{
 		client: &http.Client{
@@ -32,6 +33,8 @@ func NewExtractor() domain.ThreadsFetcher {
 	}
 }
 
+// GetPostWithURL fetches media information for a given Threads post URL.
+// It scrapes the embed page of the Threads post.
 func (repo *Extractor) GetPostWithURL(URL *url.URL) (media domain.Media, err error) {
 	URL.RawQuery = ""
 

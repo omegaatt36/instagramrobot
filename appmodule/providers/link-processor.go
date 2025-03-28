@@ -8,21 +8,27 @@ import (
 	"github.com/omegaatt36/instagramrobot/domain"
 )
 
-// LinkProcessor is the implementation of LinkProcessor.
+// LinkProcessor orchestrates the fetching and sending of media based on the input link.
 type LinkProcessor struct {
+	// InstagramFetcher fetches content from Instagram.
 	InstagramFetcher domain.InstagramFetcher
-	ThreadsFetcher   domain.ThreadsFetcher
-	MediaSender      domain.MediaSender
+	// ThreadsFetcher fetches content from Threads.
+	ThreadsFetcher domain.ThreadsFetcher
+	// MediaSender sends the processed media to the destination (e.g., Telegram).
+	MediaSender domain.MediaSender
 }
 
-// NewLinkProcessorRequest is the request for LinkProcessor.
+// NewLinkProcessorRequest contains the dependencies required to create a LinkProcessor.
 type NewLinkProcessorRequest struct {
+	// InstagramFetcher fetches content from Instagram.
 	InstagramFetcher domain.InstagramFetcher
-	ThreadsFetcher   domain.ThreadsFetcher
-	Sender           domain.MediaSender
+	// ThreadsFetcher fetches content from Threads.
+	ThreadsFetcher domain.ThreadsFetcher
+	// Sender sends the processed media.
+	Sender domain.MediaSender
 }
 
-// NewLinkProcessor constructor
+// NewLinkProcessor creates a new instance of LinkProcessor with the provided dependencies.
 func NewLinkProcessor(req NewLinkProcessorRequest) *LinkProcessor {
 	return &LinkProcessor{
 		InstagramFetcher: req.InstagramFetcher,
@@ -31,7 +37,9 @@ func NewLinkProcessor(req NewLinkProcessorRequest) *LinkProcessor {
 	}
 }
 
-// ProcessLink will process a single link
+// ProcessLink takes a URL string, determines the source (Instagram or Threads),
+// fetches the media content using the appropriate fetcher, and then sends it
+// using the configured MediaSender.
 func (processor *LinkProcessor) ProcessLink(link string) error {
 	// Convert link to URL object
 	url, err := url.ParseRequestURI(link)
@@ -68,7 +76,6 @@ func (processor *LinkProcessor) ProcessLink(link string) error {
 	}
 
 	// Extract short code
-
 	if err := processor.MediaSender.Send(&media); err != nil {
 		return fmt.Errorf("couldn't send the media, %w", err)
 	}

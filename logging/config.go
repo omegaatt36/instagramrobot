@@ -8,7 +8,9 @@ import (
 	"github.com/omegaatt36/instagramrobot/cliflag"
 )
 
+// cfg holds logging configuration, primarily the log level.
 type cfg struct {
+	// logLevel specifies the minimum level for log messages (e.g., "debug", "info", "error").
 	logLevel string
 }
 
@@ -18,7 +20,7 @@ func init() {
 	cliflag.Register(&defaultConfig)
 }
 
-// CliFlags returns cli flags to setup cache package.
+// CliFlags returns the command-line flags for configuring the logging package.
 func (cfg *cfg) CliFlags() []cli.Flag {
 	var flags []cli.Flag
 

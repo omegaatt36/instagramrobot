@@ -22,6 +22,7 @@ func Main(ctx context.Context) {
 		logging.Fatalf("couldn't register the Telegram bot: %v", err)
 	}
 
+	// Wait for the bot to stop and for the context cancellation signal.
 	stopped := bot.Start(ctx)
 
 	<-stopped

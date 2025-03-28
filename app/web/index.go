@@ -12,24 +12,28 @@ import (
 	"github.com/omegaatt36/instagramrobot/logging"
 )
 
-// Embed the entire directory.
-//
 //go:embed index.html
 var indexHTML embed.FS
 
+// media is a helper struct for passing data to the HTML template.
 type media struct {
-	URL     string
+	// URL is the base64 encoded data URL for the media.
+	URL string
+	// IsVideo indicates if the media is a video.
 	IsVideo bool
 }
 
-// handler function #1 - returns the index.html template, with film data
+// index handles requests to the root path ("/"), rendering the main index.html page.
 func (s *Server) index(w http.ResponseWriter, r *http.Request) {
 	if err := s.indexPage.Execute(w, nil); err != nil {
 		logging.ErrorCtx(r.Context(), err)
 	}
 }
 
-// handler function #2 - returns the template block with the newly added film, as an HTMX response
+// parse handles POST requests to "/parse/" (typically from HTMX).
+// It extracts the Instagram URL from the form, fetches the media using the
+// Instagram fetcher, encodes the media to base64 data URLs, and renders the
+// "medias" template block with the results.
 func (s *Server) parse(w http.ResponseWriter, r *http.Request) {
 	url := r.PostFormValue("url")
 
@@ -40,7 +44,7 @@ func (s *Server) parse(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	domainMedia, err := instagram.NewInstagramFetcher().GetPostWithCode(shortCode)
+	domainMedia, err := instagram.NewExtractor().GetPostWithCode(shortCode)
 	if err != nil {
 		logging.ErrorCtx(r.Context(), err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
@@ -80,6 +84,10 @@ func (s *Server) parse(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+// encodeMediaToBase64 downloads media content from a URL and encodes it into a
+// base64 data URL string suitable for embedding directly in HTML.
+// Note: This can be inefficient for large files, especially videos. Consider
+// proxying or direct linking if performance becomes an issue.
 func encodeMediaToBase64(link string, isVideo bool) (m media, err error) {
 	bs, err := downloadImage(link)
 	if err != nil {
@@ -99,6 +107,7 @@ func encodeMediaToBase64(link string, isVideo bool) (m media, err error) {
 	return
 }
 
+// downloadImage fetches the content of a given URL and returns it as a byte slice.
 func downloadImage(url string) ([]byte, error) {
 	// 發送 GET 請求以下載圖片
 	resp, err := http.Get(url)
@@ -116,6 +125,7 @@ func downloadImage(url string) ([]byte, error) {
 	return imageData, nil
 }
 
+// encodeToBase64 encodes a byte slice into a standard base64 string.
 func encodeToBase64(imageData []byte) string {
 	// 將圖片數據編碼為 Base64 字符串
 	base64Str := base64.StdEncoding.EncodeToString(imageData)

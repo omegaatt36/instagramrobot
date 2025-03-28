@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"log"
 	"net"
 	"net/http"
 	"regexp"
@@ -15,15 +14,24 @@ import (
 	"github.com/gocolly/colly/v2"
 
 	"github.com/omegaatt36/instagramrobot/domain"
+	"github.com/omegaatt36/instagramrobot/logging"
 )
 
-// Extractor is the implement for fetching Instagram media.
+// Extractor implements the domain.InstagramFetcher interface.
 type Extractor struct {
+	// client is the HTTP client used for making requests.
 	client *http.Client
 }
 
-// NewInstagramFetcher will create a new instance of InstagramFetcherRepo.
-func NewInstagramFetcher() domain.InstagramFetcher {
+var (
+	// Regular expression to extract embedded JSON data from Instagram embed pages.
+	gqlDataRegex = regexp.MustCompile(`\\\"gql_data\\\":([\s\S]*)\}\"\}\]\]\,\[\"NavigationMetrics`)
+	// Regular expression to extract shortcode from Instagram URLs.
+	shortCodeRegex = regexp.MustCompile(`(p|tv|reel|reels\/videos)\/([A-Za-z0-9-_]+)`)
+)
+
+// NewExtractor creates a new instance of Extractor with a configured HTTP client.
+func NewExtractor() domain.InstagramFetcher {
 	return &Extractor{
 		client: &http.Client{
 			Timeout: 10 * time.Second,
@@ -37,7 +45,7 @@ func NewInstagramFetcher() domain.InstagramFetcher {
 	}
 }
 
-// fromEmbedResponse will automatically transforms the EmbedResponse to the Media
+// fromEmbedResponse transforms the internal EmbedResponse structure to the domain.Media model.
 func fromEmbedResponse(embed EmbedResponse) domain.Media {
 	media := domain.Media{
 		ShortCode: embed.Media.ShortCode,
@@ -56,8 +64,9 @@ func fromEmbedResponse(embed EmbedResponse) domain.Media {
 	return media
 }
 
-// GetPostWithCode lets you to get information about specific Instagram post
-// by providing its unique short code
+// GetPostWithCode fetches media information for a given Instagram post shortcode.
+// It attempts to parse embedded JSON data from the embed page.
+// If JSON parsing fails, it falls back to extracting the cover photo URL.
 func (repo *Extractor) GetPostWithCode(code string) (domain.Media, error) {
 	URL := fmt.Sprintf("https://www.instagram.com/p/%v/embed/captioned/", code)
 
@@ -71,20 +80,25 @@ func (repo *Extractor) GetPostWithCode(code string) (domain.Media, error) {
 	})
 
 	collector.OnHTML("script", func(e *colly.HTMLElement) {
-		r := regexp.MustCompile(`\\\"gql_data\\\":([\s\S]*)\}\"\}\]\]\,\[\"NavigationMetrics`)
-		match := r.FindStringSubmatch(e.Text)
+		match := gqlDataRegex.FindStringSubmatch(e.Text)
 
 		if len(match) < 2 {
 			return
 		}
 
+		// Note: This string replacement is fragile and might break if Instagram changes the embedding format.
 		s := strings.ReplaceAll(match[1], `\"`, `"`)
 		s = strings.ReplaceAll(s, `\\/`, `/`)
 		s = strings.ReplaceAll(s, `\\`, `\`)
 
-		err := json.Unmarshal([]byte(s), &embedResponse)
-		if err != nil {
-			log.Fatal(err)
+		// Use a local error variable instead of log.Fatal
+		parseErr := json.Unmarshal([]byte(s), &embedResponse)
+		if parseErr != nil {
+			// Log the error but don't terminate the application.
+			// The function will continue and might fall back to cover photo extraction.
+			logging.Errorf("Failed to unmarshal GQL data for code %s: %v", code, parseErr)
+			// Clear embedResponse to ensure fallback logic triggers correctly if needed
+			embedResponse = EmbedResponse{}
 		}
 	})
 
@@ -109,13 +123,14 @@ func (repo *Extractor) GetPostWithCode(code string) (domain.Media, error) {
 		}, nil
 	}
 
-	// if every two methods have failed, then return an error
+	// If both JSON parsing and cover photo extraction failed, return an error.
 	return domain.Media{}, errors.New("failed to fetch the post\nthe page might be \"private\", or\nthe link is completely wrong")
 }
 
-// ExtractShortCodeFromLink will extract the media short code from a URL link or path
+// ExtractShortCodeFromLink extracts the media shortcode from an Instagram URL path.
+// It supports various URL formats like /p/, /tv/, /reel/, /reels/videos/.
 func ExtractShortCodeFromLink(link string) (string, error) {
-	values := regexp.MustCompile(`(p|tv|reel|reels\/videos)\/([A-Za-z0-9-_]+)`).FindStringSubmatch(link)
+	values := shortCodeRegex.FindStringSubmatch(link)
 	if len(values) != 3 {
 		return "", errors.New("couldn't extract the media short code from the link")
 	}

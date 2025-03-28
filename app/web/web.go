@@ -9,12 +9,17 @@ import (
 	"github.com/omegaatt36/instagramrobot/logging"
 )
 
-// Server is the main controller for the bot.
+// Server manages the web application, including routing and handling HTTP requests.
 type Server struct {
-	port      int
+	// port is the TCP port the server listens on.
+	port int
+	// indexPage is the parsed HTML template for the main page.
 	indexPage *template.Template
 }
 
+// NewServer creates and initializes a new Server instance.
+// It parses the embedded HTML template and initializes the Instagram fetcher.
+// It panics if template parsing fails.
 func NewServer() *Server {
 	index, err := template.ParseFS(indexHTML, "index.html")
 	if err != nil {
@@ -26,6 +31,8 @@ func NewServer() *Server {
 	}
 }
 
+// startHttp configures the HTTP routes, creates an HTTP server, and starts it.
+// It also sets up graceful shutdown based on the provided context.
 func (s *Server) startHttp(ctx context.Context) {
 	mux := http.NewServeMux()
 	mux.HandleFunc("/", s.index)
@@ -50,7 +57,9 @@ func (s *Server) startHttp(ctx context.Context) {
 	}()
 }
 
-// Start brings bot into motion by consuming incoming updates
+// Start begins the web server's listening process in a separate goroutine.
+// It returns a channel that closes when the server has gracefully shut down.
+// It uses the provided context to trigger the shutdown process.
 func (s *Server) Start(ctx context.Context) <-chan struct{} {
 	logging.Info("Instagram fetcher web starting")
 	closeChain := make(chan struct{})

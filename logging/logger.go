@@ -8,11 +8,14 @@ import (
 	"go.uber.org/zap/zapcore"
 )
 
+// logger holds the global zap logger instance.
 var (
 	logger *zap.Logger
 )
 
-// Init initializes the logger.
+// Init initializes the global logger instance based on the environment and configuration.
+// It sets the log level, chooses between console (development) and JSON (production) encoding,
+// disables timestamps (optional, change if needed), and sets up global convenience functions (Info, Debugf, etc.).
 func Init(isProd bool) {
 	level := zapcore.DebugLevel
 	if defaultConfig.logLevel != "" {
@@ -31,7 +34,7 @@ func Init(isProd bool) {
 		getEncoder = zapcore.NewJSONEncoder
 	}
 
-	// disable timestamp
+	// Optionally disable timestamp - remove or adjust if timestamps are desired.
 	encoderConfig.TimeKey = ""
 	encoderConfig.EncodeTime = nil
 
@@ -59,14 +62,19 @@ func Init(isProd bool) {
 	Warnf = sugar.Warnf
 }
 
-// ctxKey is the type of value for the context key.
+// ctxKey defines the type for the context key used to store the logger.
 type ctxKey struct{}
 
-// NewContext returns a new context with the logger instance.
+// NewContext embeds the global logger instance into a new context.
+// This allows passing the logger implicitly through function calls.
 func NewContext(parent context.Context) context.Context {
 	return context.WithValue(parent, ctxKey{}, logger)
 }
 
+// fromContext retrieves the logger instance from the context.
+// If the logger is not found in the context, it returns the global logger instance.
+// It uses zap.AddCallerSkip(1) to ensure the caller information points to the
+// user's code (e.g., InfoCtx) rather than this function itself.
 func fromContext(ctx context.Context) *zap.Logger {
 	c, ok := ctx.Value(ctxKey{}).(*zap.Logger)
 	if !ok {

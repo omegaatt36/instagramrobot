@@ -9,12 +9,13 @@ import (
 	"github.com/omegaatt36/instagramrobot/logging"
 )
 
+// MediaSender implements the domain.MediaSender interface for Telegram.
 type MediaSender struct {
 	bot *telebot.Bot
 	msg *telebot.Message
 }
 
-// NewMediaSender creates a new MediaSenderImpl instance
+// NewMediaSender creates a new MediaSender instance for sending media to Telegram.
 func NewMediaSender(bot *telebot.Bot, msg *telebot.Message) domain.MediaSender {
 	return &MediaSender{
 		bot: bot,
@@ -22,7 +23,9 @@ func NewMediaSender(bot *telebot.Bot, msg *telebot.Message) domain.MediaSender {
 	}
 }
 
-// Send will start to process Media and eventually send it to the Telegram chat
+// Send sends the media content (photos/videos) to the Telegram chat associated
+// with the original message. It handles both single media items and albums (carousels).
+// It calls SendCaption afterwards to send the text caption separately.
 func (m *MediaSender) Send(media *domain.Media) error {
 	logging.Infof("chatID(%d) source(%s) short code(%s)", m.msg.Sender.ID, media.Source, media.ShortCode)
 
@@ -42,6 +45,7 @@ func (m *MediaSender) Send(media *domain.Media) error {
 	return m.SendCaption(media)
 }
 
+// sendSingleMedia sends a single photo or video to the chat.
 func (m *MediaSender) sendSingleMedia(media *domain.Media) error {
 	if media.URL == "" {
 		return nil
@@ -58,6 +62,7 @@ func (m *MediaSender) sendSingleMedia(media *domain.Media) error {
 	return nil
 }
 
+// sendNestedMedia sends multiple photos or videos as a Telegram album.
 func (m *MediaSender) sendNestedMedia(media *domain.Media) error {
 	var album telebot.Album
 
@@ -73,7 +78,8 @@ func (m *MediaSender) sendNestedMedia(media *domain.Media) error {
 	return nil
 }
 
-// SendCaption will send the caption to the chat.
+// SendCaption sends the media's caption as a reply to the original message.
+// It truncates captions longer than Telegram's limit (4096 characters).
 func (m *MediaSender) SendCaption(media *domain.Media) error {
 	// If caption is empty, ignore sending it
 	if media.Caption == "" {
