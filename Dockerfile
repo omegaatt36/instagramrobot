@@ -10,6 +10,8 @@ COPY . .
 
 ENV GOPROXY=https://proxy.golang.org
 
+ENV CGO_ENABLED=0
+
 RUN ["go", "build", "-o", "insta-fetcher", "cmd/bot/main.go"]
 
 FROM build as dev
