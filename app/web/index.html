@@ -6,26 +6,72 @@
         <title>Instagram Fetcher</title>
         <script src="https://cdn.tailwindcss.com"></script>
         <script src="https://unpkg.com/htmx.org@2.0.3"></script>
+        <style>
+            /* Add a subtle scrollbar style if needed, otherwise default is fine */
+            ::-webkit-scrollbar {
+                width: 8px;
+            }
+            ::-webkit-scrollbar-thumb {
+                background: #ccc;
+                border-radius: 4px;
+            }
+            ::-webkit-scrollbar-track {
+                background: #f1f1f1;
+            }
+            /* Style for the enlarged media overlay */
+            .enlarged-overlay {
+                position: fixed;
+                inset: 0;
+                background-color: rgba(0, 0, 0, 0.85); /* Darker overlay */
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                z-index: 50;
+                cursor: zoom-out; /* Indicate it can be closed */
+            }
+            .enlarged-content {
+                max-width: 90%;
+                max-height: 90%;
+                object-fit: contain; /* Ensure aspect ratio is maintained */
+                display: block; /* Ensure image/video behaves like a block */
+                margin: auto; /* Center in flex container if dimensions are smaller */
+                cursor: default; /* Reset cursor for the content itself */
+            }
+        </style>
     </head>
-    <body class="bg-gray-100 min-h-screen py-12 px-4 sm:px-6 lg:px-8">
-        <div class="max-w-md mx-auto bg-white rounded-xl shadow-md overflow-hidden md:max-w-2xl">
-            <div class="md:flex">
-                <div class="p-8 w-full">
-                    <div class="uppercase tracking-wide text-sm text-indigo-500 font-semibold mb-1">Instagram Fetcher</div>
-                    <h2 class="block mt-1 text-lg leading-tight font-medium text-black">Get Instagram Post/Reels Content</h2>
-                    <p class="mt-2 text-gray-500">Enter the URL of an Instagram post or reel to fetch its content.</p>
-                    <form hx-post="/parse/" hx-target="#media-content" hx-swap="innerHTML" class="mt-6">
-                        <label for="post-url" class="block text-sm font-medium text-gray-700">Instagram Post/Reels URL</label>
-                        <div class="mt-1 relative rounded-md shadow-sm">
-                            <input type="text" name="url" id="post-url" class="focus:ring-indigo-500 focus:border-indigo-500 block w-full pl-3 pr-12 sm:text-sm border-gray-300 rounded-md" placeholder="https://www.instagram.com/p/..." />
+    <body class="bg-gray-50 min-h-screen font-sans text-gray-900">
+        <!-- Header -->
+        <header class="py-4 border-b border-gray-300 bg-white sticky top-0 z-10">
+            <div class="max-w-xl mx-auto px-4">
+                <h1 class="text-xl font-semibold text-center tracking-tight">Instagram Content Fetcher</h1>
+            </div>
+        </header>
+
+        <main class="py-8 px-4 sm:px-6 lg:px-8">
+            <!-- Input Form Card -->
+            <div class="max-w-xl mx-auto bg-white rounded-lg border border-gray-300 overflow-hidden mb-8">
+                <div class="p-6">
+                    <h2 class="text-base font-semibold text-gray-800 mb-1">Fetch Post or Reel</h2>
+                    <p class="text-sm text-gray-500 mb-4">Enter the URL below to retrieve its media and caption.</p>
+                    <form hx-post="/parse/" hx-target="#media-content" hx-swap="innerHTML" class="space-y-4">
+                        <div>
+                            <label for="post-url" class="sr-only">Instagram Post/Reels URL</label>
+                            <input
+                                type="text"
+                                name="url"
+                                id="post-url"
+                                class="block w-full px-3 py-2 text-sm border border-gray-300 rounded-md placeholder-gray-400 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 bg-gray-50"
+                                placeholder="e.g., https://www.instagram.com/p/..."
+                            />
                         </div>
                         <button
                             type="submit"
                             id="submit-btn"
-                            class="mt-4 w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                            class="w-full flex items-center justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-500 hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50"
                         >
                             <span id="button-text">Submit</span>
-                            <svg id="spinner" class="animate-spin ml-3 h-5 w-5 text-white hidden" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                            <!-- Spinner SVG -->
+                            <svg id="spinner" class="animate-spin ml-2 h-4 w-4 text-white hidden" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                                 <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
                                 <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                             </svg>
@@ -33,57 +79,109 @@
                     </form>
                 </div>
             </div>
-        </div>
 
-        <div id="media-content" class="mt-8 max-w-md mx-auto md:max-w-2xl">
-            {{ block "medias" .}}
-            <p class="text-gray-700 text-center mb-4">{{ .Caption }}</p>
-            <div class="grid gap-4 grid-cols-1 sm:grid-cols-2">
-                {{ range .Medias }}
-                <div class="bg-white rounded-lg shadow-md overflow-hidden">
-                    {{ if .IsVideo }}
-                    <video src="{{ .URL }}" controls class="w-full h-auto"></video>
-                    {{ else }}
-                    <img src="{{ .URL }}" alt="Image" class="w-full h-auto object-cover" />
+            <!-- Media Content Area -->
+            <div id="media-content" class="max-w-xl mx-auto">
+                <!-- Fetched content will be loaded here via HTMX -->
+                {{ block "medias" .}} {{ if .Medias }}
+                <div class="bg-white rounded-lg border border-gray-300 overflow-hidden">
+                    <!-- Caption Area -->
+                    {{ if .Caption }}
+                    <div class="p-4 border-b border-gray-200">
+                        <p class="text-sm text-gray-800 whitespace-pre-wrap">{{ .Caption }}</p>
+                    </div>
                     {{ end }}
+
+                    <!-- Media Grid/Carousel Area -->
+                    <div class="grid gap-0.5 grid-cols-1 {{ if gt (len .Medias) 1 }}sm:grid-cols-2{{ end }} bg-gray-200">
+                        {{ range .Medias }}
+                        <div class="bg-white flex items-center justify-center aspect-square overflow-hidden group relative cursor-pointer">
+                            {{ if .IsVideo }}
+                            <video src="{{ .URL }}" controls class="block w-full h-full object-cover"></video>
+                            {{ else }}
+                            <img src="{{ .URL }}" alt="Fetched media" class="block w-full h-full object-cover" loading="lazy" />
+                            {{ end }}
+                            <!-- Add a subtle overlay or icon on hover if desired -->
+                        </div>
+                        {{ end }}
+                    </div>
                 </div>
-                {{ end }}
+                {{ else if .Caption }}
+                <!-- Handle case where maybe only caption was passed (e.g., error state or initial empty state) -->
+                <p class="text-gray-500 text-center">{{ .Caption }}</p>
+                {{ end }} {{ end }}
             </div>
-            {{ end }}
-        </div>
+        </main>
 
         <script>
+            const submitButton = document.getElementById("submit-btn");
+            const spinner = document.getElementById("spinner");
+            const buttonText = document.getElementById("button-text");
+
+            // HTMX Request Handling for Loading State
             document.body.addEventListener("htmx:beforeRequest", function (evt) {
-                const spinner = document.getElementById("spinner");
-                const buttonText = document.getElementById("button-text");
                 spinner.classList.remove("hidden");
                 buttonText.textContent = "Loading...";
+                submitButton.disabled = true; // Disable button during request
             });
 
             document.body.addEventListener("htmx:afterRequest", function (evt) {
-                const spinner = document.getElementById("spinner");
-                const buttonText = document.getElementById("button-text");
                 spinner.classList.add("hidden");
                 buttonText.textContent = "Submit";
+                submitButton.disabled = false; // Re-enable button
+                // Optional: Clear input field after successful request
+                // if (evt.detail.successful) {
+                //     const inputField = document.getElementById('post-url');
+                //     if (inputField) inputField.value = '';
+                // }
             });
 
+            // Function to handle media click for enlargement
+            function handleMediaClick(mediaElement) {
+                const enlarged = document.createElement("div");
+                enlarged.className = "enlarged-overlay"; // Use class for styling
+                enlarged.onclick = function () {
+                    this.remove(); // Remove overlay on click
+                };
+
+                const content = mediaElement.cloneNode(true); // Clone the clicked media
+                content.className = "enlarged-content"; // Use class for styling
+                content.removeAttribute("controls"); // Remove controls from enlarged video initially if needed
+                if (content.tagName === "VIDEO") {
+                    content.setAttribute("controls", ""); // Ensure controls are present for video
+                    content.play(); // Optional: Auto-play video
+                }
+                // Prevent clicks on the content itself from closing the overlay
+                content.onclick = function (e) {
+                    e.stopPropagation();
+                };
+
+                enlarged.appendChild(content);
+                document.body.appendChild(enlarged);
+            }
+
+            // Attach click listeners after HTMX swap
             htmx.on("htmx:afterSwap", function (evt) {
-                evt.detail.elt.querySelectorAll("img, video").forEach(function (media) {
-                    media.addEventListener("click", function () {
-                        const enlarged = document.createElement("div");
-                        enlarged.className = "fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50";
-                        enlarged.onclick = function () {
-                            this.remove();
-                        };
-
-                        const content = media.cloneNode();
-                        content.className = "max-w-[90%] max-h-[90%] object-contain";
-
-                        enlarged.appendChild(content);
-                        document.body.appendChild(enlarged);
-                    });
+                // Target the newly swapped content area
+                const contentArea = evt.detail.elt;
+                contentArea.querySelectorAll("img, video").forEach(function (media) {
+                    // Remove any old listeners first to prevent duplicates if swapping multiple times
+                    media.removeEventListener("click", media._clickHandler);
+                    // Store the handler reference on the element to remove it later
+                    media._clickHandler = function () {
+                        handleMediaClick(this);
+                    };
+                    media.addEventListener("click", media._clickHandler);
                 });
             });
+
+            // Initial attachment for any media potentially loaded on page load (unlikely with current template structure but good practice)
+            // document.addEventListener('DOMContentLoaded', () => {
+            //     document.querySelectorAll('#media-content img, #media-content video').forEach(media => {
+            //         media._clickHandler = function () { handleMediaClick(this); };
+            //         media.addEventListener('click', media._clickHandler);
+            //     });
+            // });
         </script>
     </body>
 </html>
