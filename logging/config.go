@@ -2,7 +2,7 @@
 package logging
 
 import (
-	"github.com/urfave/cli/v2"
+	"github.com/urfave/cli/v3"
 	"go.uber.org/zap"
 
 	"github.com/omegaatt36/instagramrobot/cliflag"
@@ -26,11 +26,11 @@ func (cfg *cfg) CliFlags() []cli.Flag {
 
 	flags = append(flags, &cli.StringFlag{
 		Name:        "log-level",
-		EnvVars:     []string{"LOG_LEVEL"},
+		Sources:     cli.EnvVars("LOG_LEVEL"),
 		Destination: &cfg.logLevel,
-		Required:    false,
-		DefaultText: zap.DebugLevel.String(),
-		Value:       zap.DebugLevel.String(),
+		Required:    false,                   // Required is still supported
+		DefaultText: zap.DebugLevel.String(), // DefaultText is still supported
+		Value:       zap.DebugLevel.String(), // Value sets the default
 	})
 
 	return flags

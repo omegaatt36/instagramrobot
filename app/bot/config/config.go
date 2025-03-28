@@ -3,7 +3,7 @@
 package config
 
 import (
-	"github.com/urfave/cli/v2"
+	"github.com/urfave/cli/v3"
 
 	"github.com/omegaatt36/instagramrobot/cliflag"
 )
@@ -20,8 +20,6 @@ type Env string
 type config struct {
 	// appEnvironment stores the current application environment (e.g., "local", "production").
 	appEnvironment string
-	// botToken stores the Telegram Bot API token.
-	botToken string
 }
 
 var defaultConfig config
@@ -37,26 +35,14 @@ func (cfg *config) CliFlags() []cli.Flag {
 
 	flags = append(flags, &cli.StringFlag{
 		Name:        "app-env",
-		EnvVars:     []string{"APP_ENV"},
+		Sources:     cli.EnvVars("APP_ENV"),
 		Destination: &cfg.appEnvironment,
 		Required:    false,
 		DefaultText: EnvLocal.String(),
 		Value:       EnvLocal.String(),
 	})
 
-	flags = append(flags, &cli.StringFlag{
-		Name:        "bot-token",
-		EnvVars:     []string{"BOT_TOKEN"},
-		Destination: &cfg.botToken,
-		Required:    true,
-	})
-
 	return flags
-}
-
-// BotToken returns the bot token.
-func BotToken() string {
-	return defaultConfig.botToken
 }
 
 // IsLocal will return true if the APP_ENV is equals to local.

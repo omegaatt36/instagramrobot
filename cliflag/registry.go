@@ -1,9 +1,11 @@
 package cliflag
 
 import (
+	"context"
+	"fmt"
 	"log"
 
-	"github.com/urfave/cli/v2"
+	"github.com/urfave/cli/v3"
 )
 
 // CliFlager is interface to describe a struct
@@ -21,8 +23,8 @@ type CliFlager interface {
 // Beforer defines an optional interface for packages that need an initialization
 // hook to run *before* the main application logic, after flags are parsed.
 type Beforer interface {
-	// Before performs initialization tasks. It receives the cli context.
-	Before(*cli.Context) error
+	// Before performs initialization tasks. It receives the context and command.
+	Before(context.Context, *cli.Command) error
 }
 
 // Afterer is interface for some package may needs an after hook to destroy
@@ -30,8 +32,8 @@ type Beforer interface {
 // Afterer defines an optional interface for packages that need a cleanup
 // hook to run *after* the main application logic has finished.
 type Afterer interface {
-	// After performs cleanup tasks.
-	After()
+	// After performs cleanup tasks. It receives the context and command.
+	After(context.Context, *cli.Command) error
 }
 
 var cliFlagers []CliFlager
@@ -61,14 +63,14 @@ func Globals() []cli.Flag {
 
 // Initialize iterates through all registered packages and calls the Before method
 // for those that implement the Beforer interface.
-func Initialize(c *cli.Context) error {
+func Initialize(ctx context.Context, cmd *cli.Command) error {
 	for _, f := range cliFlagers {
 		b, ok := f.(Beforer)
 		if ok {
-			log.Printf("running %T", b)
-			err := b.Before(c)
+			log.Printf("running Before for %T", b)
+			err := b.Before(ctx, cmd)
 			if err != nil {
-				return err
+				return fmt.Errorf("before hook failed for %T: %w", b, err)
 			}
 		}
 	}
@@ -77,16 +79,29 @@ func Initialize(c *cli.Context) error {
 }
 
 // Finalize iterates through all registered packages and calls the After method
-// (using defer for LIFO execution) for those that implement the Afterer interface.
-func Finalize(c *cli.Context) error {
+// for those that implement the Afterer interface.
+func Finalize(ctx context.Context, cmd *cli.Command) error {
 	//revive:disable:defer
-	for _, f := range cliFlagers {
+	var finalizationErrors []error
+	// Iterate in reverse to mimic defer LIFO order somewhat for cleanup
+	for i := len(cliFlagers) - 1; i >= 0; i-- {
+		f := cliFlagers[i]
 		a, ok := f.(Afterer)
 		if ok {
-			defer a.After()
+			log.Printf("running After for %T", a)
+			err := a.After(ctx, cmd)
+			if err != nil {
+				log.Printf("error during finalize for %T: %v", a, err)
+				// Collect errors, decide later how to handle them (e.g., return first, aggregate)
+				finalizationErrors = append(finalizationErrors, fmt.Errorf("after hook failed for %T: %w", a, err))
+			}
 		}
 	}
 	//revive:enable:defer
+
+	if len(finalizationErrors) > 0 {
+		return finalizationErrors[0]
+	}
 
 	return nil
 }

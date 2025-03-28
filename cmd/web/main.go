@@ -3,7 +3,7 @@ package main
 import (
 	"context"
 
-	"github.com/urfave/cli/v2"
+	"github.com/urfave/cli/v3"
 
 	"github.com/omegaatt36/instagramrobot/app"
 	"github.com/omegaatt36/instagramrobot/app/bot/config"
@@ -13,7 +13,7 @@ import (
 )
 
 // Main is the entry point of the application.
-func Main(ctx context.Context) {
+func Main(ctx context.Context, cmd *cli.Command) error {
 	logging.Init(!config.IsLocal())
 
 	go health.StartServer()
@@ -21,16 +21,28 @@ func Main(ctx context.Context) {
 	// Wait for the web server to stop and for the context cancellation signal.
 	stopped := web.NewServer().Start(ctx)
 
-	<-stopped
-	<-ctx.Done()
+	select {
+	case <-stopped:
+		logging.Info("Web server stopped normally.")
+	case <-ctx.Done():
+		logging.Info("Shutdown signal received, waiting for web server to stop...")
+		// Wait for server to finish stopping after context cancellation
+		<-stopped
+		logging.Info("Web server stopped after signal.")
+	}
+
 	logging.Info("Shutting down")
+	return nil // Indicate successful execution
 }
 
 func main() {
-	app := app.App{
-		Main:  Main,
+	// Initialize app structure for v3
+	application := app.App{
+		Main: Main,
+		// Base flags for the app itself, if any, go here.
+		// Module flags are added via cliflag.Globals() in app.Run()
 		Flags: []cli.Flag{},
 	}
 
-	app.Run()
+	application.Run()
 }

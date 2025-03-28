@@ -3,7 +3,7 @@ package main
 import (
 	"context"
 
-	"github.com/urfave/cli/v2"
+	"github.com/urfave/cli/v3"
 
 	"github.com/omegaatt36/instagramrobot/app"
 	"github.com/omegaatt36/instagramrobot/app/bot"
@@ -12,29 +12,48 @@ import (
 	"github.com/omegaatt36/instagramrobot/logging"
 )
 
+var botToken string
+
 // Main is the entry point of the application.
-func Main(ctx context.Context) {
+func Main(ctx context.Context, cmd *cli.Command) error {
 	logging.Init(!config.IsLocal())
 
 	go health.StartServer()
 
-	if err := bot.Register(config.BotToken()); err != nil {
-		logging.Fatalf("couldn't register the Telegram bot: %v", err)
+	if err := bot.Register(botToken); err != nil {
+		// Use Errorf instead of Fatalf to allow potential cleanup via After hooks
+		logging.Errorf("couldn't register the Telegram bot: %v", err)
+		return err
 	}
 
-	// Wait for the bot to stop and for the context cancellation signal.
 	stopped := bot.Start(ctx)
 
-	<-stopped
-	<-ctx.Done()
+	select {
+	case <-stopped:
+		logging.Info("Bot stopped normally.")
+	case <-ctx.Done():
+		logging.Info("Shutdown signal received, waiting for bot to stop...")
+		// Wait for bot to finish stopping after context cancellation
+		<-stopped
+		logging.Info("Bot stopped after signal.")
+	}
+
 	logging.Info("Shutting down")
+	return nil
 }
 
 func main() {
-	app := app.App{
-		Main:  Main,
-		Flags: []cli.Flag{},
+	application := app.App{
+		Main: Main,
+		Flags: []cli.Flag{
+			&cli.StringFlag{
+				Name:        "bot-token",
+				Sources:     cli.EnvVars("BOT_TOKEN"),
+				Destination: &botToken,
+				Required:    true,
+			},
+		},
 	}
 
-	app.Run()
+	application.Run()
 }
