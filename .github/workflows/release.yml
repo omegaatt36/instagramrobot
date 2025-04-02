@@ -1,4 +1,4 @@
-name: Docker Build and Push
+name: Build muiltiple platform container image
 
 on:
   release:
@@ -84,7 +84,7 @@ jobs:
           context: .
           file: ./Dockerfile.buildx
           platforms: linux/amd64,linux/arm64
-          push: false
+          push: true
           tags: |
             omegaatt36/insta-fetcher:latest
             omegaatt36/insta-fetcher:${{ github.event_name == 'release' && github.ref_name || github.event_name == 'workflow_dispatch' && github.event.inputs.tag }}
