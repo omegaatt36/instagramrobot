@@ -1,11 +1,6 @@
 version: "3"
 
 tasks:
-  docker:
-    cmds:
-      - |
-        docker buildx build --platform linux/amd64,linux/arm64 \
-        -t omegaatt36/insta-fetcher:latest . --push
   default:
     cmds:
       - task: dependency
@@ -37,3 +32,9 @@ tasks:
   live-web:
     cmds:
       - air --build.cmd "go build -o build/web cmd/web/main.go" --build.bin "./build/web"
+  dev:
+    env:
+      BOT_TOKEN: XXXXX
+    cmds:
+      - docker build -f Dockerfile.dev -t insta-fetcher:dev .
+      - docker run -e BOT_TOKEN=${BOT_TOKEN} insta-fetcher:dev
