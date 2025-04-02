@@ -1,0 +1,7 @@
+FROM gcr.io/distroless/static-debian12
+
+ARG TARGETARCH
+
+COPY insta-fetcher-${TARGETARCH} /insta-fetcher
+
+CMD ["/insta-fetcher"]

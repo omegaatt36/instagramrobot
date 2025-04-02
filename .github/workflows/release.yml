@@ -13,15 +13,48 @@ on:
         required: true
 
 jobs:
-  build-and-push:
-    runs-on: ubuntu-latest
+  build-binaries:
+    strategy:
+      matrix:
+        include:
+          - arch: amd64
+            os: ubuntu-24.04
+          - arch: arm64
+            os: ubuntu-24.04-arm
+    runs-on: ${{ matrix.os }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
         with:
           ref: ${{ github.event_name == 'release' && github.ref_name || github.event_name == 'workflow_dispatch' && github.event.inputs.branch || github.head_ref }}
 
-      - name: Set up QEMU
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: "1.24"
+
+      - name: Build Go binary for ${{ matrix.arch }}
+        env:
+          GOOS: linux
+          GOARCH: ${{ matrix.arch }}
+          CGO_ENABLED: 0
+        run: go build -ldflags="-s -w" -o insta-fetcher-${{ matrix.arch }} cmd/bot/main.go
+
+      - name: Upload binary artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: binary-${{ matrix.arch }}
+          path: insta-fetcher-${{ matrix.arch }}
+          retention-days: 1
+
+  build-and-push-image:
+    needs: build-binaries
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up QEMU (for Docker buildx)
         uses: docker/setup-qemu-action@v3
 
       - name: Set up Docker Buildx
@@ -33,13 +66,27 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-      - name: Build and Push
+      - name: Download all binary artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: binaries # Download artifacts into a 'binaries' directory
+
+      - name: Move binaries to build context root
+        run: |
+          mv binaries/binary-amd64/insta-fetcher-amd64 ./insta-fetcher-amd64
+          mv binaries/binary-arm64/insta-fetcher-arm64 ./insta-fetcher-arm64
+          echo "Files in context root:"
+          ls -l .
+
+      - name: Build and Push Multi-Platform Image
         uses: docker/build-push-action@v6
         with:
-          push: true
-          file: Dockerfile
+          context: .
+          file: ./Dockerfile.buildx
           platforms: linux/amd64,linux/arm64
+          push: false
           tags: |
             omegaatt36/insta-fetcher:latest
             omegaatt36/insta-fetcher:${{ github.event_name == 'release' && github.ref_name || github.event_name == 'workflow_dispatch' && github.event.inputs.tag }}
-          context: .
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
