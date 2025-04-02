@@ -94,28 +94,38 @@ go run cmd/web/main.go --app-env=development
 # go run cmd/bot/main.go
 ```
 
-### Using Docker
+### Using Docker (Recommended)
 
-This is the recommended deployment method, using containers to package the application and its dependencies.
+This project provides multi-platform Docker images (`linux/amd64`, `linux/arm64`) hosted on Docker Hub: `omegaatt36/insta-fetcher`. These images are built automatically via GitHub Actions upon new releases.
 
-Building the container image:
-
-```sh
-# Build for both bot and web (multi-stage build likely defined in Dockerfile)
-docker compose build
-# Or, if you build images separately or push to registry (like in Taskfile.yaml):
-# docker buildx build --platform linux/amd64,linux/arm64 -t your-repo/insta-fetcher:latest . --push
-```
-
-Running the container (using Docker Compose):
-Check the `deploy/docker-compose.yml` file to ensure environment variables (like `BOT_TOKEN`) are set.
+Running the pre-built container (Telegram Bot Example):
 
 ```sh
-# Make sure BOT_TOKEN is set in deploy/docker-compose.yml or your environment
-docker compose -f deploy/docker-compose.yml up -d # Use -d to run in detached mode
+docker run -d --restart=always \
+  -e BOT_TOKEN="YOUR_BOT_TOKEN" \
+  -e APP_ENV="production" \
+  -e LOG_LEVEL="info" \
+  --name instagram-bot \
+  omegaatt36/insta-fetcher:latest # Or specify a version tag like :v1.2.3
 ```
 
-This Compose file might start both the Bot and Web services, or you might need to choose. Please check its contents.
+Replace `YOUR_BOT_TOKEN` with your actual Telegram Bot token. Adjust environment variables (`APP_ENV`, `LOG_LEVEL`) as needed.
+
+Using Docker Compose:
+You can use the `deploy/docker-compose.yml` file as a template. Ensure it references the `omegaatt36/insta-fetcher` image and that you set the necessary environment variables (like `BOT_TOKEN`).
+
+```sh
+# Edit deploy/docker-compose.yml first to set BOT_TOKEN etc.
+# Make sure the image: field is set to omegaatt36/insta-fetcher:latest
+docker compose -f deploy/docker-compose.yml up -d
+```
+
+Local Development with Docker:
+For a development environment without needing Go installed locally, you can use `Dockerfile.dev`:
+
+```sh
+task dev
+```
 
 ### Using Kubernetes (Helm)
 
@@ -134,6 +144,7 @@ popd
 ```
 
 You will need to edit `deploy/charts/bot/values.yaml` to set your Bot Token and other configurations.
+Make sure the Helm chart's `values.yaml` is configured to pull the `omegaatt36/insta-fetcher` image from Docker Hub.
 
 ### As a Systemd Service
 
@@ -200,9 +211,9 @@ sudo journalctl -u insta-fetcher.service -f
 
 ## Development
 
-This project uses `go-task` (Taskfile.yaml) to manage the development workflow.
+This project uses `go-task` (Taskfile.yaml) to manage common development tasks.
 
-Install development dependencies:
+Install development dependencies (linters, formatters etc.):
 
 ```sh
 task dependency
@@ -214,7 +225,7 @@ Format code:
 task fmt
 ```
 
-Run linters and checks:
+Run linters and static analysis checks:
 
 ```sh
 task check
@@ -233,4 +244,4 @@ Requires `air` to be installed first: `go install github.com/cosmtrek/air@latest
 task live-web
 ```
 
-This monitors Go file changes, automatically recompiling and restarting the web server.
+This monitors Go file changes in `cmd/web`, automatically recompiling and restarting the web server.
