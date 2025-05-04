@@ -8,8 +8,7 @@ import (
 	"sync"
 	"time"
 
-	"github.com/prometheus/client_golang/prometheus/promhttp"
-
+	"github.com/VictoriaMetrics/metrics"
 	"github.com/omegaatt36/instagramrobot/logging"
 )
 
@@ -139,7 +138,9 @@ func StartServer() {
 	r.HandleFunc("/alive", aliveHandler)
 	r.HandleFunc("/ready", readyHandler)
 	r.HandleFunc("/vars", varHandler)
-	r.HandleFunc("/metrics", promhttp.Handler().ServeHTTP)
+	r.HandleFunc("/metrics", func(w http.ResponseWriter, req *http.Request) {
+		metrics.WritePrometheus(w, true)
+	})
 	r.HandleFunc("/dump", func(w http.ResponseWriter, r *http.Request) {
 		gatherTrackers(true)
 		w.WriteHeader(http.StatusOK)
