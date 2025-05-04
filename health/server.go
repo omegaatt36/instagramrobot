@@ -9,6 +9,7 @@ import (
 	"time"
 
 	"github.com/VictoriaMetrics/metrics"
+
 	"github.com/omegaatt36/instagramrobot/logging"
 )
 

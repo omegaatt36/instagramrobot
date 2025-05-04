@@ -83,7 +83,12 @@
             <!-- Media Content Area -->
             <div id="media-content" class="max-w-xl mx-auto">
                 <!-- Fetched content will be loaded here via HTMX -->
-                {{ block "medias" .}} {{ if .Medias }}
+                {{ block "medias" .}} {{/* Check if an error message exists */}} {{ if .Error }}
+                <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative" role="alert">
+                    <strong class="font-bold">Error:</strong>
+                    <span class="block sm:inline">{{ .Error }}</span>
+                </div>
+                {{ else if .Medias }} {{/* Only render media content if there are medias and no error */}}
                 <div class="bg-white rounded-lg border border-gray-300 overflow-hidden">
                     <!-- Caption Area -->
                     {{ if .Caption }}
@@ -107,8 +112,11 @@
                     </div>
                 </div>
                 {{ else if .Caption }}
-                <!-- Handle case where maybe only caption was passed (e.g., error state or initial empty state) -->
-                <p class="text-gray-500 text-center">{{ .Caption }}</p>
+                <div class="bg-white rounded-lg border border-gray-300 overflow-hidden">
+                    <div class="p-4">
+                        <p class="text-sm text-gray-800 whitespace-pre-wrap">{{ .Caption }}</p>
+                    </div>
+                </div>
                 {{ end }} {{ end }}
             </div>
         </main>
