@@ -75,7 +75,7 @@ func (repo *Extractor) GetPostWithURL(URL *url.URL) (media domain.Media, err err
 	})
 
 	if err := collector.Visit(URL.String()); err != nil {
-		return domain.Media{}, fmt.Errorf("failed to send HTTP request to the Instagram: %v", err)
+		return domain.Media{}, fmt.Errorf("failed to send HTTP request to the Threads: %v", err)
 	}
 
 	return

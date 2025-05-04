@@ -84,8 +84,9 @@ func (x *Controller) processLinks(links []string, m *telebot.Message) error {
 	linkProcessor := providers.NewLinkProcessor(providers.NewLinkProcessorRequest{
 		InstagramFetcher: instagram.NewExtractor(),
 		ThreadsFetcher:   threads.NewExtractor(),
-		Sender:           telegram.NewMediaSender(x.bot, m),
 	})
+
+	sender := telegram.NewMediaSender(x.bot, m)
 
 	for index, link := range links {
 		if index == maxLinksPerMessage {
@@ -93,9 +94,15 @@ func (x *Controller) processLinks(links []string, m *telebot.Message) error {
 			break
 		}
 
-		if err := linkProcessor.ProcessLink(link); err != nil {
+		media, err := linkProcessor.ProcessLink(link)
+		if err != nil {
 			logging.Error(fmt.Errorf("processLinks.ProcessLink: %w", err))
-			continue // 繼續處理下一個 link
+			continue
+		}
+
+		if err := sender.Send(media); err != nil {
+			logging.Error(fmt.Errorf("processLinks.ProcessLink: %w", err))
+			continue
 		}
 	}
 

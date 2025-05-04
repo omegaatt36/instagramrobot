@@ -6,6 +6,9 @@ import (
 	"net/http"
 	"text/template"
 
+	"github.com/omegaatt36/instagramrobot/appmodule/instagram"
+	"github.com/omegaatt36/instagramrobot/appmodule/providers"
+	"github.com/omegaatt36/instagramrobot/appmodule/threads"
 	"github.com/omegaatt36/instagramrobot/logging"
 )
 
@@ -15,6 +18,8 @@ type Server struct {
 	port int
 	// indexPage is the parsed HTML template for the main page.
 	indexPage *template.Template
+	// linkProcessor is the instance of LinkProcessor used to process links.
+	linkProcessor *providers.LinkProcessor
 }
 
 // NewServer creates and initializes a new Server instance.
@@ -28,6 +33,10 @@ func NewServer() *Server {
 	return &Server{
 		port:      8080,
 		indexPage: index,
+		linkProcessor: providers.NewLinkProcessor(providers.NewLinkProcessorRequest{
+			InstagramFetcher: instagram.NewExtractor(),
+			ThreadsFetcher:   threads.NewExtractor(),
+		}),
 	}
 }
 

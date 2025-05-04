@@ -8,7 +8,6 @@ import (
 	"net/http"
 	"strings"
 
-	"github.com/omegaatt36/instagramrobot/appmodule/instagram"
 	"github.com/omegaatt36/instagramrobot/logging"
 )
 
@@ -35,16 +34,7 @@ func (s *Server) index(w http.ResponseWriter, r *http.Request) {
 // Instagram fetcher, encodes the media to base64 data URLs, and renders the
 // "medias" template block with the results.
 func (s *Server) parse(w http.ResponseWriter, r *http.Request) {
-	url := r.PostFormValue("url")
-
-	shortCode, err := instagram.ExtractShortCodeFromLink(url)
-	if err != nil {
-		logging.ErrorCtx(r.Context(), err)
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
-
-	domainMedia, err := instagram.NewExtractor().GetPostWithCode(shortCode)
+	domainMedia, err := s.linkProcessor.ProcessLink(r.PostFormValue("url"))
 	if err != nil {
 		logging.ErrorCtx(r.Context(), err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
