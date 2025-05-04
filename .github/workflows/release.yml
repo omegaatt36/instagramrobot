@@ -69,12 +69,14 @@ jobs:
       - name: Download all binary artifacts
         uses: actions/download-artifact@v4
         with:
-          path: binaries # Download artifacts into a 'binaries' directory
+          path: binaries
 
       - name: Move binaries to build context root
         run: |
           mv binaries/binary-amd64/insta-fetcher-amd64 ./insta-fetcher-amd64
           mv binaries/binary-arm64/insta-fetcher-arm64 ./insta-fetcher-arm64
+          chmod +x insta-fetcher-amd64
+          chmod +x insta-fetcher-arm64
           echo "Files in context root:"
           ls -l .
 
