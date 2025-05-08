@@ -62,8 +62,8 @@ github.com/EDDYCJY/fake-useragent v0.2.0/go.mod h1:5wn3zzlDxhKW6NYknushqinPcAqZc
 github.com/OneOfOne/xxhash v1.2.2/go.mod h1:HSdplMjZKSmBqAxg5vPj2TmRDmfkzw+cTzAElWljhcU=
 github.com/PuerkitoBio/goquery v1.10.2 h1:7fh2BdHcG6VFZsK7toXBT/Bh1z5Wmy8Q9MV9HqT2AM8=
 github.com/PuerkitoBio/goquery v1.10.2/go.mod h1:0guWGjcLu9AYC7C1GHnpysHy056u9aEkUHwhdnePMCU=
-github.com/VictoriaMetrics/metrics v1.35.4 h1:GhZ17bHYkujpSzGaH459F7huTLNJ7z90ZXsOXjhHx/8=
-github.com/VictoriaMetrics/metrics v1.35.4/go.mod h1:r7hveu6xMdUACXvB8TYdAj8WEsKzWB0EkpJN+RDtOf8=
+github.com/VictoriaMetrics/metrics v1.36.0 h1:f3SZMpLgIG4hJm2zfDs6wicxQ/QNWBZekY5rEGgbHKs=
+github.com/VictoriaMetrics/metrics v1.36.0/go.mod h1:r7hveu6xMdUACXvB8TYdAj8WEsKzWB0EkpJN+RDtOf8=
 github.com/alecthomas/template v0.0.0-20160405071501-a0175ee3bccc/go.mod h1:LOuyumcjzFXgccqObfd/Ljyb9UuFJ6TxHnclSeseNhc=
 github.com/alecthomas/template v0.0.0-20190718012654-fb15b899a751/go.mod h1:LOuyumcjzFXgccqObfd/Ljyb9UuFJ6TxHnclSeseNhc=
 github.com/alecthomas/units v0.0.0-20151022065526-2efee857e7cf/go.mod h1:ybxpYRFXyAe+OPACYpWeL0wqObRcbAqCMya13uyzqw0=

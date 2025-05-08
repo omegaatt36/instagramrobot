@@ -4,7 +4,7 @@ go 1.24
 
 require (
 	github.com/EDDYCJY/fake-useragent v0.2.0
-	github.com/VictoriaMetrics/metrics v1.35.4
+	github.com/VictoriaMetrics/metrics v1.36.0
 	github.com/gocolly/colly/v2 v2.2.0
 	github.com/stretchr/testify v1.10.0
 	github.com/urfave/cli/v3 v3.3.2
