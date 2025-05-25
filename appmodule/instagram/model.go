@@ -49,7 +49,7 @@ type OwnerTimeline struct {
 	Edges []struct {
 		// Node contains details of a media item thumbnail.
 		Node struct {
-			Id string `json:"string"` // Note: JSON key is literally "string"
+			ID string `json:"string"` // Note: JSON key is literally "string"
 			// ThumbnailSrc is the URL of a thumbnail image.
 			ThumbnailSrc string `json:"thumbnail_src"`
 			// ThumbnailResources provides different resolution thumbnails.
@@ -60,8 +60,8 @@ type OwnerTimeline struct {
 
 // Owner represents the Instagram user who created the post.
 type Owner struct {
-	// Id is the unique numerical ID of the user.
-	Id string `json:"id"`
+	// ID is the unique numerical ID of the user.
+	ID string `json:"id"`
 	// ProfilePictureURL is the URL to the user's profile picture.
 	ProfilePictureURL string `json:"profile_pic_url"`
 	// Username is the user's unique username.
@@ -80,8 +80,8 @@ type Owner struct {
 
 // SliderItemNode represents a single media item within a multi-item post (carousel).
 type SliderItemNode struct {
-	// Id is the unique ID of this specific media item.
-	Id string `json:"id"`
+	// ID is the unique ID of this specific media item.
+	ID string `json:"id"`
 	// ShortCode is the shortcode of the parent post.
 	ShortCode string `json:"shortcode"`
 	// Type indicates the type of media (e.g., "GraphImage", "GraphVideo").
