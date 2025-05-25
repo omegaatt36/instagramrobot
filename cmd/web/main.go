@@ -13,7 +13,7 @@ import (
 )
 
 // Main is the entry point of the application.
-func Main(ctx context.Context, cmd *cli.Command) error {
+func Main(ctx context.Context, _ *cli.Command) error {
 	logging.Init(!config.IsLocal())
 
 	go health.StartServer()

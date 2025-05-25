@@ -40,9 +40,9 @@ func NewServer() *Server {
 	}
 }
 
-// startHttp configures the HTTP routes, creates an HTTP server, and starts it.
+// startHTTP configures the HTTP routes, creates an HTTP server, and starts it.
 // It also sets up graceful shutdown based on the provided context.
-func (s *Server) startHttp(ctx context.Context) {
+func (s *Server) startHTTP(ctx context.Context) {
 	mux := http.NewServeMux()
 	mux.HandleFunc("/", s.index)
 	mux.HandleFunc("/parse/", s.parse)
@@ -73,7 +73,7 @@ func (s *Server) Start(ctx context.Context) <-chan struct{} {
 	logging.Info("Instagram fetcher web starting")
 	closeChain := make(chan struct{})
 
-	go s.startHttp(ctx)
+	go s.startHTTP(ctx)
 
 	go func() {
 		defer func() {

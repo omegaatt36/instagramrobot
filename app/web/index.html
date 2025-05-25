@@ -4,10 +4,116 @@
         <meta charset="UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <title>Instagram Fetcher</title>
-        <script src="https://cdn.tailwindcss.com"></script>
+        <link rel="stylesheet" href="https://unpkg.com/material-components-web@latest/dist/material-components-web.min.css" />
+        <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500&display=swap" rel="stylesheet" />
+        <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet" />
         <script src="https://unpkg.com/htmx.org@2.0.3"></script>
         <style>
-            /* Add a subtle scrollbar style if needed, otherwise default is fine */
+            body {
+                font-family: "Roboto", sans-serif;
+                background-color: #f5f5f5;
+                margin: 0;
+                display: flex;
+                flex-direction: column;
+                min-height: 100vh;
+            }
+            .mdc-top-app-bar {
+                background-color: #6200ee;
+            }
+            .mdc-top-app-bar__title {
+                color: white;
+            }
+            main {
+                padding: 16px;
+                padding-top: 72px;
+                flex-grow: 1;
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                width: 100%;
+            }
+            .form-card,
+            .media-card-container {
+                width: 100%;
+                max-width: 600px;
+                margin-bottom: 24px;
+            }
+            .mdc-card__content {
+                padding: 16px;
+            }
+            .mdc-text-field.mdc-text-field--fullwidth {
+                width: 100%;
+            }
+            .submit-button-container {
+                display: flex;
+                justify-content: flex-end;
+                padding-top: 16px;
+            }
+            .mdc-button--raised .mdc-circular-progress {
+                margin-left: 8px;
+                --mdc-circular-progress-bar-color: white;
+            }
+            .error-card {
+                background-color: #fce4e4;
+                color: #b00020;
+                padding: 16px;
+            }
+            .error-card .material-icons {
+                margin-right: 8px;
+                vertical-align: middle;
+            }
+            .caption-text {
+                white-space: pre-wrap;
+                padding: 16px;
+                font-size: 0.875rem;
+                color: rgba(0, 0, 0, 0.87);
+            }
+            .media-grid {
+                display: grid;
+                gap: 4px;
+            }
+            .media-grid.single-item {
+                grid-template-columns: 1fr;
+            }
+            .media-grid.multi-item {
+                grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            }
+            .media-item {
+                position: relative;
+                background-color: #e0e0e0;
+                cursor: pointer;
+                overflow: hidden;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            }
+            .media-item .fetched-media {
+                display: block;
+                width: 100%;
+                height: 100%;
+                object-fit: cover;
+            }
+            .media-item video.fetched-media {
+                min-height: 200px;
+            }
+            .enlarged-overlay {
+                position: fixed;
+                inset: 0;
+                background-color: rgba(0, 0, 0, 0.85);
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                z-index: 1000;
+                cursor: zoom-out;
+            }
+            .enlarged-content {
+                max-width: 90%;
+                max-height: 90%;
+                object-fit: contain;
+                display: block;
+                margin: auto;
+                cursor: default;
+            }
             ::-webkit-scrollbar {
                 width: 8px;
             }
@@ -18,148 +124,166 @@
             ::-webkit-scrollbar-track {
                 background: #f1f1f1;
             }
-            /* Style for the enlarged media overlay */
-            .enlarged-overlay {
-                position: fixed;
-                inset: 0;
-                background-color: rgba(0, 0, 0, 0.85); /* Darker overlay */
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                z-index: 50;
-                cursor: zoom-out; /* Indicate it can be closed */
+            #spinner.mdc-circular-progress {
+                display: none;
             }
-            .enlarged-content {
-                max-width: 90%;
-                max-height: 90%;
-                object-fit: contain; /* Ensure aspect ratio is maintained */
-                display: block; /* Ensure image/video behaves like a block */
-                margin: auto; /* Center in flex container if dimensions are smaller */
-                cursor: default; /* Reset cursor for the content itself */
+            #spinner.mdc-circular-progress--indeterminate {
+                display: inline-block;
+            }
+            .mdc-circular-progress {
+                width: 24px;
+                height: 24px;
             }
         </style>
     </head>
-    <body class="bg-gray-50 min-h-screen font-sans text-gray-900">
-        <!-- Header -->
-        <header class="py-4 border-b border-gray-300 bg-white sticky top-0 z-10">
-            <div class="max-w-xl mx-auto px-4">
-                <h1 class="text-xl font-semibold text-center tracking-tight">Instagram Content Fetcher</h1>
+    <body class="mdc-typography">
+        <header class="mdc-top-app-bar mdc-top-app-bar--fixed">
+            <div class="mdc-top-app-bar__row">
+                <section class="mdc-top-app-bar__section mdc-top-app-bar__section--align-start">
+                    <span class="mdc-top-app-bar__title">Instagram Content Fetcher</span>
+                </section>
             </div>
         </header>
 
-        <main class="py-8 px-4 sm:px-6 lg:px-8">
-            <!-- Input Form Card -->
-            <div class="max-w-xl mx-auto bg-white rounded-lg border border-gray-300 overflow-hidden mb-8">
-                <div class="p-6">
-                    <h2 class="text-base font-semibold text-gray-800 mb-1">Fetch Post or Reel</h2>
-                    <p class="text-sm text-gray-500 mb-4">Enter the URL below to retrieve its media and caption.</p>
-                    <form hx-post="/parse/" hx-target="#media-content" hx-swap="innerHTML" class="space-y-4">
-                        <div>
-                            <label for="post-url" class="sr-only">Instagram Post/Reels URL</label>
-                            <input
-                                type="text"
-                                name="url"
-                                id="post-url"
-                                class="block w-full px-3 py-2 text-sm border border-gray-300 rounded-md placeholder-gray-400 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 bg-gray-50"
-                                placeholder="e.g., https://www.instagram.com/p/..."
-                            />
+        <main>
+            <div class="form-card mdc-card">
+                <div class="mdc-card__content">
+                    <h2 class="mdc-typography--headline6" style="margin-bottom: 8px">Fetch Post or Reel</h2>
+                    <p class="mdc-typography--body2" style="color: rgba(0, 0, 0, 0.6); margin-bottom: 16px">Enter the URL below to retrieve its media and caption.</p>
+                    <form hx-post="/parse/" hx-target="#media-content" hx-swap="innerHTML">
+                        <label class="mdc-text-field mdc-text-field--outlined mdc-text-field--fullwidth" style="margin-bottom: 16px">
+                            <span class="mdc-notched-outline">
+                                <span class="mdc-notched-outline__leading"></span>
+                                <span class="mdc-notched-outline__notch">
+                                    <span id="post-url-label" class="mdc-floating-label">Instagram Post/Reels URL</span>
+                                </span>
+                                <span class="mdc-notched-outline__trailing"></span>
+                            </span>
+                            <input type="text" name="url" id="post-url" class="mdc-text-field__input" aria-labelledby="post-url-label" />
+                        </label>
+
+                        <div class="submit-button-container">
+                            <button type="submit" id="submit-btn" class="mdc-button mdc-button--raised">
+                                <span class="mdc-button__ripple"></span>
+                                <span class="mdc-button__label" id="button-text">Submit</span>
+                                <div id="spinner" class="mdc-circular-progress mdc-circular-progress--small" role="progressbar" aria-label="Loading" aria-valuemin="0" aria-valuemax="1">
+                                    <div class="mdc-circular-progress__determinate-container">
+                                        <svg class="mdc-circular-progress__determinate-circle-graphic" viewBox="0 0 24 24">
+                                            <circle class="mdc-circular-progress__determinate-track" cx="12" cy="12" r="8.75" style="stroke-width: 2.5"></circle>
+                                            <circle class="mdc-circular-progress__determinate-circle" cx="12" cy="12" r="8.75" stroke-dasharray="54.978" stroke-dashoffset="54.978" style="stroke-width: 2.5"></circle>
+                                        </svg>
+                                    </div>
+                                    <div class="mdc-circular-progress__indeterminate-container">
+                                        <div class="mdc-circular-progress__spinner-layer">
+                                            <div class="mdc-circular-progress__circle-clipper mdc-circular-progress__circle-left">
+                                                <svg class="mdc-circular-progress__indeterminate-circle-graphic" viewBox="0 0 24 24">
+                                                    <circle cx="12" cy="12" r="8.75" stroke-dasharray="54.978" stroke-dashoffset="27.489" style="stroke-width: 2.5"></circle>
+                                                </svg>
+                                            </div>
+                                            <div class="mdc-circular-progress__gap-patch">
+                                                <svg class="mdc-circular-progress__indeterminate-circle-graphic" viewBox="0 0 24 24">
+                                                    <circle cx="12" cy="12" r="8.75" stroke-dasharray="54.978" stroke-dashoffset="27.489" style="stroke-width: 2.5"></circle>
+                                                </svg>
+                                            </div>
+                                            <div class="mdc-circular-progress__circle-clipper mdc-circular-progress__circle-right">
+                                                <svg class="mdc-circular-progress__indeterminate-circle-graphic" viewBox="0 0 24 24">
+                                                    <circle cx="12" cy="12" r="8.75" stroke-dasharray="54.978" stroke-dashoffset="27.489" style="stroke-width: 2.5"></circle>
+                                                </svg>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </button>
                         </div>
-                        <button
-                            type="submit"
-                            id="submit-btn"
-                            class="w-full flex items-center justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-500 hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50"
-                        >
-                            <span id="button-text">Submit</span>
-                            <!-- Spinner SVG -->
-                            <svg id="spinner" class="animate-spin ml-2 h-4 w-4 text-white hidden" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                            </svg>
-                        </button>
                     </form>
                 </div>
             </div>
 
-            <!-- Media Content Area -->
-            <div id="media-content" class="max-w-xl mx-auto">
-                <!-- Fetched content will be loaded here via HTMX -->
-                {{ block "medias" .}} {{/* Check if an error message exists */}} {{ if .Error }}
-                <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative" role="alert">
-                    <strong class="font-bold">Error:</strong>
-                    <span class="block sm:inline">{{ .Error }}</span>
+            <div id="media-content" class="media-card-container">
+                {{ block "medias" .}} {{ if .Error }}
+                <div class="mdc-card error-card">
+                    <i class="material-icons">error_outline</i>
+                    <span class="mdc-typography--body1"><strong>Error:</strong> {{ .Error }}</span>
                 </div>
-                {{ else if .Medias }} {{/* Only render media content if there are medias and no error */}}
-                <div class="bg-white rounded-lg border border-gray-300 overflow-hidden">
-                    <!-- Caption Area -->
+                {{ else if .Medias }}
+                <div class="mdc-card">
                     {{ if .Caption }}
-                    <div class="p-4 border-b border-gray-200">
-                        <p class="text-sm text-gray-800 whitespace-pre-wrap">{{ .Caption }}</p>
-                    </div>
+                    <div class="caption-text mdc-typography--body2">{{ .Caption }}</div>
+                    <div class="mdc-card__divider" style="margin-top: 0; margin-bottom: 0"></div>
                     {{ end }}
-
-                    <!-- Media Grid/Carousel Area -->
-                    <div class="grid gap-0.5 grid-cols-1 {{ if gt (len .Medias) 1 }}sm:grid-cols-2{{ end }} bg-gray-200">
+                    <div class="media-grid {{ if gt (len .Medias) 1 }}multi-item{{ else }}single-item{{ end }}">
                         {{ range .Medias }}
-                        <div class="bg-white flex items-center justify-center aspect-square overflow-hidden group relative cursor-pointer">
+                        <div class="media-item">
                             {{ if .IsVideo }}
-                            <video src="{{ .URL }}" controls class="block w-full h-full object-cover"></video>
+                            <video src="{{ .URL }}" class="fetched-media" controls></video>
                             {{ else }}
-                            <img src="{{ .URL }}" alt="Fetched media" class="block w-full h-full object-cover" loading="lazy" />
+                            <img src="{{ .URL }}" class="fetched-media" alt="Fetched media" loading="lazy" />
                             {{ end }}
-                            <!-- Add a subtle overlay or icon on hover if desired -->
                         </div>
                         {{ end }}
                     </div>
                 </div>
                 {{ else if .Caption }}
-                <div class="bg-white rounded-lg border border-gray-300 overflow-hidden">
-                    <div class="p-4">
-                        <p class="text-sm text-gray-800 whitespace-pre-wrap">{{ .Caption }}</p>
-                    </div>
+                <div class="mdc-card">
+                    <div class="caption-text mdc-typography--body2">{{ .Caption }}</div>
                 </div>
                 {{ end }} {{ end }}
             </div>
         </main>
 
+        <script src="https://unpkg.com/material-components-web@latest/dist/material-components-web.min.js"></script>
         <script>
             const submitButton = document.getElementById("submit-btn");
             const spinner = document.getElementById("spinner");
+            let mdcCircularProgressInstance;
             const buttonText = document.getElementById("button-text");
 
-            // HTMX Request Handling for Loading State
             document.body.addEventListener("htmx:beforeRequest", function (evt) {
-                spinner.classList.remove("hidden");
-                buttonText.textContent = "Loading...";
-                submitButton.disabled = true; // Disable button during request
+                if (submitButton && evt.detail.elt.closest('form[hx-post="/parse/"]')) {
+                    if (spinner) {
+                        spinner.classList.add("mdc-circular-progress--indeterminate");
+                        spinner.style.display = "inline-block";
+                    }
+                    if (buttonText) buttonText.textContent = "Loading...";
+                    if (submitButton) submitButton.disabled = true;
+                }
             });
 
             document.body.addEventListener("htmx:afterRequest", function (evt) {
-                spinner.classList.add("hidden");
-                buttonText.textContent = "Submit";
-                submitButton.disabled = false; // Re-enable button
-                // Optional: Clear input field after successful request
-                // if (evt.detail.successful) {
-                //     const inputField = document.getElementById('post-url');
-                //     if (inputField) inputField.value = '';
-                // }
+                if (submitButton && evt.detail.elt.closest('form[hx-post="/parse/"]')) {
+                    if (spinner) {
+                        spinner.classList.remove("mdc-circular-progress--indeterminate");
+                        spinner.style.display = "none";
+                    }
+                    if (buttonText) buttonText.textContent = "Submit";
+                    if (submitButton) submitButton.disabled = false;
+                    const swappedContent = evt.detail.target;
+                    if (swappedContent && swappedContent.id === "media-content") {
+                        swappedContent.querySelectorAll(".mdc-text-field").forEach((el) => {
+                            if (!el.MDCTextField) mdc.textField.MDCTextField.attachTo(el);
+                        });
+                        swappedContent.querySelectorAll(".mdc-button, .mdc-icon-button").forEach((el) => {
+                            if (!el.MDCRipple) mdc.ripple.MDCRipple.attachTo(el);
+                        });
+                        swappedContent.querySelectorAll(".mdc-circular-progress").forEach((el) => {
+                            if (!el.MDCCircularProgress) mdc.circularProgress.MDCCircularProgress.attachTo(el);
+                        });
+                    }
+                }
             });
 
-            // Function to handle media click for enlargement
             function handleMediaClick(mediaElement) {
                 const enlarged = document.createElement("div");
-                enlarged.className = "enlarged-overlay"; // Use class for styling
+                enlarged.className = "enlarged-overlay";
                 enlarged.onclick = function () {
-                    this.remove(); // Remove overlay on click
+                    this.remove();
                 };
 
-                const content = mediaElement.cloneNode(true); // Clone the clicked media
-                content.className = "enlarged-content"; // Use class for styling
-                content.removeAttribute("controls"); // Remove controls from enlarged video initially if needed
+                const content = mediaElement.cloneNode(true);
+                content.className = "enlarged-content";
                 if (content.tagName === "VIDEO") {
-                    content.setAttribute("controls", ""); // Ensure controls are present for video
-                    content.play(); // Optional: Auto-play video
+                    content.setAttribute("controls", "");
                 }
-                // Prevent clicks on the content itself from closing the overlay
                 content.onclick = function (e) {
                     e.stopPropagation();
                 };
@@ -168,28 +292,44 @@
                 document.body.appendChild(enlarged);
             }
 
-            // Attach click listeners after HTMX swap
             htmx.on("htmx:afterSwap", function (evt) {
-                // Target the newly swapped content area
-                const contentArea = evt.detail.elt;
-                contentArea.querySelectorAll("img, video").forEach(function (media) {
-                    // Remove any old listeners first to prevent duplicates if swapping multiple times
-                    media.removeEventListener("click", media._clickHandler);
-                    // Store the handler reference on the element to remove it later
-                    media._clickHandler = function () {
-                        handleMediaClick(this);
-                    };
-                    media.addEventListener("click", media._clickHandler);
-                });
+                const contentArea = evt.detail.target;
+                if (contentArea && contentArea.id === "media-content") {
+                    contentArea.querySelectorAll(".fetched-media").forEach(function (media) {
+                        media.removeEventListener("click", media._clickHandler);
+                        media._clickHandler = function () {
+                            handleMediaClick(this);
+                        };
+                        media.addEventListener("click", media._clickHandler);
+                    });
+                }
             });
 
-            // Initial attachment for any media potentially loaded on page load (unlikely with current template structure but good practice)
-            // document.addEventListener('DOMContentLoaded', () => {
-            //     document.querySelectorAll('#media-content img, #media-content video').forEach(media => {
-            //         media._clickHandler = function () { handleMediaClick(this); };
-            //         media.addEventListener('click', media._clickHandler);
-            //     });
-            // });
+            document.addEventListener("DOMContentLoaded", () => {
+                document.querySelectorAll(".mdc-text-field").forEach((el) => {
+                    if (!el.MDCTextField) new mdc.textField.MDCTextField(el);
+                });
+                document.querySelectorAll(".mdc-button, .mdc-icon-button").forEach((el) => {
+                    if (!el.MDCRipple) new mdc.ripple.MDCRipple(el);
+                });
+                const topAppBarElement = document.querySelector(".mdc-top-app-bar");
+                if (topAppBarElement && !topAppBarElement.MDCTopAppBar) {
+                    new mdc.topAppBar.MDCTopAppBar(topAppBarElement);
+                }
+                if (spinner && !mdcCircularProgressInstance) {
+                    mdcCircularProgressInstance = new mdc.circularProgress.MDCCircularProgress(spinner);
+                }
+                const initialMediaContent = document.getElementById("media-content");
+                if (initialMediaContent) {
+                    initialMediaContent.querySelectorAll(".fetched-media").forEach(function (media) {
+                        media.removeEventListener("click", media._clickHandler);
+                        media._clickHandler = function () {
+                            handleMediaClick(this);
+                        };
+                        media.addEventListener("click", media._clickHandler);
+                    });
+                }
+            });
         </script>
     </body>
 </html>
