@@ -7,7 +7,7 @@ require (
 	github.com/VictoriaMetrics/metrics v1.37.0
 	github.com/gocolly/colly/v2 v2.2.0
 	github.com/stretchr/testify v1.10.0
-	github.com/urfave/cli/v3 v3.3.3
+	github.com/urfave/cli/v3 v3.3.8
 	go.uber.org/zap v1.27.0
 	gopkg.in/telebot.v4 v4.0.0-beta.5
 )
