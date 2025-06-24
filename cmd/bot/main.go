@@ -15,18 +15,19 @@ import (
 var botToken string
 
 // Main is the entry point of the application.
-func Main(ctx context.Context, cmd *cli.Command) error {
+func Main(ctx context.Context, _ *cli.Command) error {
 	logging.Init(!config.IsLocal())
 
 	go health.StartServer()
 
-	if err := bot.Register(botToken); err != nil {
+	telegramBot, err := bot.NewTelegramBot(botToken)
+	if err != nil {
 		// Use Errorf instead of Fatalf to allow potential cleanup via After hooks
-		logging.Errorf("couldn't register the Telegram bot: %v", err)
+		logging.Errorf("couldn't create the Telegram bot: %v", err)
 		return err
 	}
 
-	stopped := bot.Start(ctx)
+	stopped := telegramBot.Start(ctx)
 
 	select {
 	case <-stopped:

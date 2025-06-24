@@ -11,15 +11,14 @@ import (
 	"github.com/omegaatt36/instagramrobot/logging"
 )
 
-// b holds the global bot instance. Consider dependency injection for better testability.
-var b *telebot.Bot
+// TelegramBot wraps the telebot.Bot instance and provides lifecycle management.
+type TelegramBot struct {
+	bot *telebot.Bot
+}
 
-// Register will generate a fresh Telegram bot instance
-// and registers it's handler logics
-// Register creates and configures the global Telegram bot instance `b`.
+// NewTelegramBot creates and configures a new TelegramBot instance.
 // It sets up polling options and logging verbosity based on the environment.
-// It fatally logs errors during bot initialization.
-func Register(botToken string) error {
+func NewTelegramBot(botToken string) (*TelegramBot, error) {
 	bot, err := telebot.NewBot(telebot.Settings{
 		Token:   botToken,
 		Poller:  &telebot.LongPoller{Timeout: 10 * time.Second},
@@ -27,37 +26,38 @@ func Register(botToken string) error {
 	})
 	if err != nil {
 		logging.Error("Couldn't create the Telegram bot instance")
-		logging.Fatal(err)
+		return nil, err
 	}
-	b = bot
+
+	telegramBot := &TelegramBot{bot: bot}
 
 	logging.Info("Telegram bot instance created")
 	logging.Infof("Bot info: id(%d) username(%s) title(%s)",
-		b.Me.ID, b.Me.Username, b.Me.FirstName)
+		bot.Me.ID, bot.Me.Username, bot.Me.FirstName)
 
-	registerCommands()
+	telegramBot.registerCommands()
 
 	// TODO: set bot commands
 
-	return nil
+	return telegramBot, nil
 }
 
 // registerCommands sets up the handlers for different Telegram events (commands, text messages).
-func registerCommands() {
-	x := api.NewController(b)
+func (tb *TelegramBot) registerCommands() {
+	x := api.NewController(tb.bot)
 
-	b.Handle("/start", x.OnStart)
-	b.Handle(telebot.OnText, x.OnText)
+	tb.bot.Handle("/start", x.OnStart)
+	tb.bot.Handle(telebot.OnText, x.OnText)
 }
 
-// Start brings bot into motion by consuming incoming updates
-// Start initiates the bot's polling process in a separate goroutine.
+// Start brings bot into motion by consuming incoming updates.
+// It initiates the bot's polling process in a separate goroutine.
 // It returns a channel that will be closed when the bot stops.
 // It listens to the provided context for cancellation signals to gracefully stop the bot.
-func Start(ctx context.Context) <-chan struct{} {
+func (tb *TelegramBot) Start(ctx context.Context) <-chan struct{} {
 	logging.Info("Telegram bot starting")
 	closeChain := make(chan struct{})
-	go b.Start()
+	go tb.bot.Start()
 	go func() {
 		defer func() {
 			logging.Info("Telegram bot stopped")
@@ -66,7 +66,7 @@ func Start(ctx context.Context) <-chan struct{} {
 		}()
 
 		<-ctx.Done()
-		b.Stop()
+		tb.bot.Stop()
 	}()
 
 	return closeChain
