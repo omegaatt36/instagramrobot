@@ -1,6 +1,7 @@
 package api
 
 import (
+	"errors"
 	"fmt"
 	"regexp"
 
@@ -88,25 +89,27 @@ func (x *Controller) processLinks(links []string, m *telebot.Message) error {
 
 	sender := telegram.NewMediaSender(x.bot, m)
 
+	var errList []error
+
 	for index, link := range links {
 		if index == maxLinksPerMessage {
-			logging.Errorf("can't process more than %c links per message", maxLinksPerMessage)
+			errList = append(errList, fmt.Errorf("can't process more than %c links per message", maxLinksPerMessage))
 			break
 		}
 
 		media, err := linkProcessor.ProcessLink(link)
 		if err != nil {
-			logging.Error(fmt.Errorf("processLinks.ProcessLink: %w", err))
+			errList = append(errList, fmt.Errorf("processLinks.ProcessLink: %w", err))
 			continue
 		}
 
 		if err := sender.Send(media); err != nil {
-			logging.Error(fmt.Errorf("processLinks.ProcessLink: %w", err))
+			errList = append(errList, fmt.Errorf("processLinks.ProcessLink: %w", err))
 			continue
 		}
 	}
 
-	return nil
+	return errors.Join(errList...)
 }
 
 // replyError sends a formatted error message back to the user as a reply,
